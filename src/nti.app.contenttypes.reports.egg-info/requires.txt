@@ -1,0 +1,13 @@
+setuptools
+z3c.rml
+z3c.macro
+z3c.pagelet
+z3c.template
+zope.viewlet
+zope.contentprovider
+nti.app.pyramid_zope
+nti.app.products.gradebook
+nti.app.products.courseware
+
+[test]
+nti.app.testing
