@@ -1,7 +1,7 @@
 Metadata-Version: 1.1
 Name: nti.app.contenttypes.reports
 Version: 0.0.0.dev0
-Summary: Report generation for courses
+Summary: Report generation for reportable objects
 Home-page: UNKNOWN
 Author: NextThought
 Author-email: austin.graham@nextthought.com

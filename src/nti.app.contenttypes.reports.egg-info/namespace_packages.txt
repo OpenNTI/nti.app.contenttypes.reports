@@ -1,4 +1,3 @@
 nti
 nti.app
 nti.app.contenttypes
-nti.app.contenttypes.reports

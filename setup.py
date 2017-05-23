@@ -5,7 +5,7 @@ VERSION = '0.0.0'
 
 entry_points = {
 	"z3c.autoinclude.plugin": [
-		'target = nti.app.products',
+		'target = nti.app',
 	],
 }
 
@@ -18,7 +18,7 @@ setup(
 	version=VERSION,
 	author='NextThought',
 	author_email='austin.graham@nextthought.com',
-	description="Report generation for courses",
+	description="Report generation for reportable objects",
 	long_description=codecs.open('README.rst', encoding='utf-8').read(),
 	license='Proprietary',
 	keywords='pyramid reportlab courses reporting',
@@ -33,7 +33,7 @@ setup(
 	],
 	packages=find_packages('src'),
 	package_dir={'': 'src'},
-	namespace_packages=['nti', 'nti.app', 'nti.app.contenttypes', 'nti.app.contenttypes.reports'],
+	namespace_packages=['nti', 'nti.app', 'nti.app.contenttypes'],
 	install_requires=[
 		'setuptools',
 		'z3c.rml',
@@ -42,9 +42,7 @@ setup(
 		'z3c.template',
 		'zope.viewlet',
 		'zope.contentprovider',
-		'nti.app.pyramid_zope',
-		'nti.app.products.gradebook',
-		'nti.app.products.courseware'
+		'nti.app.pyramid_zope'
 	],
 	extras_require={
 		'test': tests_require,
