@@ -12,50 +12,32 @@ logger = __import__('logging').getLogger(__name__)
 from hamcrest import assert_that
 from hamcrest import has_property
 from hamcrest import not_none
-from hamcrest import contains_inanyorder
+from hamcrest import has_entry
+from hamcrest import contains
+
+import unittest
 
 from zope import component
 
-from zope.configuration import config
-from zope.configuration import xmlconfig
+from nti.contenttypes.reports.reports import BaseReport
 
-from nti.app.testing.application_webtest import ApplicationLayerTest
+from nti.contenttypes.reports.tests import ITestReportContext
 
-from nti.app.testing.decorators import WithSharedApplicationMockDS
 
-from nti.app.contenttypes.reports.tests import ReportsLayerTest
+from nti.app.contenttypes.reports.decorators import _ReportContextDecorator
 
-from nti.contenttypes.reports.interfaces import IReport
-
-HEAD_ZCML_STRING = u"""
-<configure  xmlns="http://namespaces.zope.org/zope"
-            xmlns:i18n="http://namespaces.zope.org/i18n"
-            xmlns:zcml="http://namespaces.zope.org/zcml"
-            xmlns:rep="http://nextthought.com/reports">
-
-    <include package="zope.component" file="meta.zcml" />
-    <include package="zope.security" file="meta.zcml" />
-    <include package="zope.component" />
-    <include package="nti.contenttypes.reports" file="meta.zcml"/>
-
-    <configure>
-        <rep:registerReport name="TestReport"
-                            description="TestDescription"
-                            interface_context="nti.contenttypes.reports.tests.ITestReportContext"
-                            permission="TestPermission"
-                            supported_types="csv pdf" />
-    </configure>
-</configure>
-
-"""
-
-class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
+class TestReportDecoration(unittest.TestCase):
     
-    @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
-        context = config.ConfigurationMachine()
-        context.package = self.get_configuration_package()
-        xmlconfig.registerCommonDirectives(context)
-        xmlconfig.string(HEAD_ZCML_STRING, context)
+        report = BaseReport(name=u"TestReport",
+                            description=u"TestDescription",
+                            interface_context=ITestReportContext,
+                            permission=u"TestPermission",
+                            supported_types=[u"csv", u"pdf"])
         
+        dec = _ReportContextDecorator(object())
+        result = {}
+        dec.decorateExternalMapping(report, result)
         
+        assert_that(result, not_none())
+        assert_that(result, has_entry("Links", contains(has_property("rel", "report-TestReport"))))
