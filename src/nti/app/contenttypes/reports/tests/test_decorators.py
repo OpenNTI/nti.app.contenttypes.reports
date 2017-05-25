@@ -84,10 +84,7 @@ class TestReportContext():
     """
     Concrete test class for ITestReportContext
     """
-
-    def __init__(self):
-        # Do nothing
-        pass
+    pass
 
 
 class TestReportDecoration(ReportsLayerTest):
@@ -113,7 +110,7 @@ class TestReportDecoration(ReportsLayerTest):
 
         # Run the decorator on the context
         dec.decorateExternalMapping(test_context, result)
-
+        print(result)
         # Be sure it has come out correctly
         assert_that(len(result), 2)
         assert_that(result,
