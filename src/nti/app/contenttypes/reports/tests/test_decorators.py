@@ -15,8 +15,12 @@ from hamcrest import has_entry
 from hamcrest import contains
 from hamcrest import contains_inanyorder
 from hamcrest import is_not
+from hamcrest import not_none
+
+import time
 
 from zope import interface
+from zope import component
 
 from zope.configuration import config
 from zope.configuration import xmlconfig
@@ -29,6 +33,31 @@ from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportContext
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
+
+from nti.app.testing.decorators import WithSharedApplicationMockDS
+
+from nti.dataserver.tests import mock_dataserver
+
+from nti.app.testing.application_webtest import ApplicationLayerTest
+
+from nti.zodb.containers import time_to_64bit_int
+
+from nti.ntiids.ntiids import make_ntiid
+from nti.ntiids.ntiids import get_provider
+from nti.ntiids.ntiids import get_specific
+from nti.ntiids.ntiids import make_specific_safe
+
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME
+
+from nti.contentlibrary import HTML
+
+from nti.ntiids import ntiids
+
+from nti.coremetadata.interfaces import IContained
+
+from nti.externalization.oids import to_external_ntiid_oid
+
+from nti.dataserver.contenttypes import Note
 
 # ZCML string to register three reports in a context
 HEAD_ZCML_STRING = u"""
@@ -80,19 +109,21 @@ class ITestWrongReportContext(IReportContext):
 
 
 @interface.implementer(ITestReportContext)
-class TestReportContext():
+class TestReportContext(Note):
     """
     Concrete test class for ITestReportContext
     """
-    pass
 
 
-class TestReportDecoration(ReportsLayerTest):
+class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
     """
     Test the decoration of report links for a report
     context
-    """
+    """ 
+    
+    username = "pgreazy"
 
+    @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
         # Create a context for the sample ZCML and run
         # the sample string
@@ -100,25 +131,48 @@ class TestReportDecoration(ReportsLayerTest):
         context.package = self.get_configuration_package()
         xmlconfig.registerCommonDirectives(context)
         xmlconfig.string(HEAD_ZCML_STRING, context)
-
-        # Create the sample context
-        test_context = TestReportContext()
-
-        # Create the decorator
-        dec = _ReportContextDecorator(object())
-        result = {}
-
-        # Run the decorator on the context
-        dec.decorateExternalMapping(test_context, result)
         
-        # Be sure it has come out correctly
-        assert_that(len(result), 2)
-        assert_that(result,
-                    has_entry("Links",
-                              contains_inanyorder(
-                                  has_property("rel", "report-TestReport"),
-                                  has_property("rel", "report-AnotherTestReport"))))
-        assert_that(result,
-                    has_entry("Links",
-                              is_not(contains(
-                                  has_property("rel", "report-ThirdTestReport")))))
+        print("")
+        print("In test: ", component.subscribers((TestReportContext(),), IReport))
+        
+        with mock_dataserver.mock_db_trans(self.ds):
+            user = self._create_user(self.username)
+            test_context = TestReportContext()
+            test_context.containerId = "samplenote"
+            user.addContainedObject(test_context)
+            ntiid = to_external_ntiid_oid(test_context)
+
+        assert_that(ntiid, not_none())
+
+        accept_type = b'application/json'
+
+        context_url = str('/dataserver2/Objects/' + ntiid)
+        _response = self.testapp.get(context_url,
+                                     headers={b"Accept": accept_type},
+                                     extra_environ=self._make_extra_environ(self.username))
+        
+        print("In test: ", component.subscribers((TestReportContext(),), IReport))
+        
+        assert_that(_response, not_none())
+
+        #assert_that(_response,
+        #            has_entry("Links",
+        #                     contains_inanyorder(
+        #                          has_property("rel", "report-TestReport"),
+        #                          has_property("rel", "report-AnotherTestReport"))))
+        #assert_that(_response,
+        #            has_entry("Links",
+        #                      is_not(contains(
+        #                          has_property("rel", "report-ThirdTestReport")))))
+
+    @WithSharedApplicationMockDS(testapp=True, users=True)
+    def test_all_report_get(self):
+        
+        with mock_dataserver.mock_db_trans(self.ds):
+            user = self._create_user(self.username)
+        
+        report_url = '/dataserver2/reporting/reports'
+        _response = self.testapp.get(
+            report_url, extra_environ=self._make_extra_environ(self.username))
+
+        print(_response.body)

@@ -18,7 +18,7 @@
 
 	<!-- Decorators -->
     <subscriber factory=".decorators._ReportContextDecorator"
-                for="*"
+                for="nti.contenttypes.reports.interfaces.IReportContext"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
 
 	<adapter name="reporting"

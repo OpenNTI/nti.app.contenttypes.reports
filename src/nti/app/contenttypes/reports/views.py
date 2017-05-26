@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
-from nti.app.contenttypes import reports
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -27,6 +26,14 @@ from nti.app.base.abstract_views import AbstractView
 from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportContext
+
+from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.externalization import to_external_object
+
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
+ITEMS = StandardExternalFields.ITEMS
 
 @interface.implementer(IPathAdapter)
 @component.adapter(IDataserverFolder, IRequest)
@@ -48,8 +55,11 @@ class ReportPathAdapter(Contained):
 class RegisteredReportsView(AbstractAuthenticatedView):
     
     def __call__(self):
+        result = LocatedExternalDict()
+        result[ITEM_COUNT] = 0
+        result[ITEMS] = []
         reports = component.getAllUtilitiesRegisteredFor(IReport)
-        for instance in reports:
-            print(instance)
-        
-        return {}
+        for report in reports:
+            result[ITEMS].append(to_external_object(report))
+            result[ITEM_COUNT] += 1
+        return result
