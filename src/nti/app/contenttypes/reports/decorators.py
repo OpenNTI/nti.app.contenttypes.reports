@@ -34,20 +34,20 @@ class _ReportContextDecorator(object):
 
     def decorateExternalMapping(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
-        
+
         # Get all IReport objects subscribed to this report context
         reports = component.subscribers((context,), IReport)
-        #print(reports)
+
         for report in reports:
             # Check user permission
-            user = get_current_request().authenticated_userid or u''
+            user = u'' if get_current_request() is None else get_current_request().authenicated_userid
             if report.predicate(context, user):
-                
+
                 # Add a link for each report
                 links.append(Link(context,
-                             rel="report-%s" % report.name,
-                             elements=("@@" + report.name),
-                             title=_(report.name)))
+                                  rel="report-%s" % report.name,
+                                  elements=("@@" + report.name),
+                                  title=_(report.name)))
             else:
                 # If the user doesn't have permission, skip this
                 # report

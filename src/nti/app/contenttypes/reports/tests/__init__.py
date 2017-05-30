@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import zope
+
 from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
@@ -16,7 +18,11 @@ from nti.testing.layers import ConfiguringLayerMixin
 class SharedConfiguringTestLayer(ZopeComponentLayer,
                                  ConfiguringLayerMixin):
 
-    set_up_packages = ('nti.contenttypes.reports', 'nti.app.contenttypes.reports')
+    set_up_packages = (
+        'nti.dataserver',
+        'nti.appserver',
+        'nti.contenttypes.reports',
+        'nti.app.contenttypes.reports')
 
     @classmethod
     def setUp(cls):
