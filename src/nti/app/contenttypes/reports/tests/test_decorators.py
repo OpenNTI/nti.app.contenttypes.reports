@@ -98,12 +98,12 @@ class TestReportDecoration(ReportsLayerTest):
         # Create the sample context
         test_context = TestReportContext()
 
-        # Create the decorator
-        dec = _ReportContextDecorator(object())
+        # Create the decorator with dummy arguments
+        dec = _ReportContextDecorator(object(), object())
         result = {}
 
         # Run the decorator on the context
-        dec.decorateExternalMapping(test_context, result)
+        dec._do_decorate_external(test_context, result)
 
         # Be sure it has come out correctly
         assert_that(result,

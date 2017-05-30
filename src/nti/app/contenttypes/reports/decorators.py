@@ -14,25 +14,24 @@ from pyramid.threadlocal import get_current_request
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
-from nti.externalization.singleton import SingletonDecorator
-
 from nti.links.links import Link
 
 from nti.contenttypes.reports.interfaces import IReport
 
 from nti.app.contenttypes.reports import MessageFactory as _
 
+from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
+
 LINKS = StandardExternalFields.LINKS
 
 
 @interface.implementer(IExternalMappingDecorator)
-class _ReportContextDecorator(object):
+class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
     Decorate report contexts with their IReport links
     """
-    __metaclass__ = SingletonDecorator
 
-    def decorateExternalMapping(self, context, result_map):
+    def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
 
         # Get all IReport objects subscribed to this report context
@@ -40,7 +39,7 @@ class _ReportContextDecorator(object):
 
         for report in reports:
             # Check user permission
-            user = u'' if get_current_request() is None else get_current_request().authenicated_userid
+            user = self.remoteUser
             if report.predicate(context, user):
 
                 # Add a link for each report
@@ -48,7 +47,3 @@ class _ReportContextDecorator(object):
                                   rel="report-%s" % report.name,
                                   elements=("@@" + report.name),
                                   title=_(report.name)))
-            else:
-                # If the user doesn't have permission, skip this
-                # report
-                continue
