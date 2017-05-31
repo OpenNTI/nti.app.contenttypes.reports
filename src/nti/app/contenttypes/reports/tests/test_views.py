@@ -50,7 +50,7 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
         self._register_report("TestReport",
                               "TestDescription",
                               ITestReportContext,
-                              "AnotherTestPermission",
+                              "TestPermission",
                               ["csv", "pdf"])
 
         self._register_report("AnotherTestReport",
