@@ -40,9 +40,6 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
     Test views for reports
     """
 
-    # Sample username for temp user requests
-    username = "pgreazy"
-
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_all_report_get(self):
 
@@ -68,14 +65,10 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
                               "ThirdTestPermission",
                               ["csv", "pdf"])
 
-        # Create a sample user
-        with mock_dataserver.mock_db_trans(self.ds):
-            user = self._create_user(self.username)
-
         # Make sample request
         report_url = '/dataserver2/reporting/reports'
         _response = self.testapp.get(
-            report_url, extra_environ=self._make_extra_environ(self.username))
+            report_url, extra_environ=self._make_extra_environ())
 
         # Turn the response body into a dictionary
         res_dict = json.loads(_response.body)
