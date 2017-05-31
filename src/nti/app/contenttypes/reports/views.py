@@ -13,11 +13,11 @@ from zope.container.contained import Contained
 
 from zope.traversing.interfaces import IPathAdapter
 
-from pyramid.interfaces import IRequest
-
 from pyramid.view import view_config
 
-from nti.dataserver.authorization import ACT_READ
+from pyramid.interfaces import IRequest
+
+from nti.dataserver.authorization import ACT_NTI_ADMIN
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
@@ -25,22 +25,21 @@ from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.contenttypes.reports.interfaces import IReport
 
-
-from nti.externalization.externalization import to_external_object
-
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
-ITEMS = StandardExternalFields.ITEMS
-TOTAL = StandardExternalFields.TOTAL
+from nti.externalization.externalization import to_external_object
+
+# Items for final result dictionary
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
+ITEMS = StandardExternalFields.ITEMS
 
 
 @interface.implementer(IPathAdapter)
 @component.adapter(IDataserverFolder, IRequest)
 class ReportPathAdapter(Contained):
 
-    __name__ = "reporting"
+    __name__ = u"reporting"
 
     def __init__(self, context, request):
         self.context = context
@@ -52,15 +51,24 @@ class ReportPathAdapter(Contained):
              renderer='rest',
              name='reports',
              request_method='GET',
-             permission=ACT_READ,
+             permission=ACT_NTI_ADMIN,
              context=ReportPathAdapter)
 class RegisteredReportsView(AbstractAuthenticatedView):
+    """
+    View to fetch all current IReport objects
+    """
 
     def __call__(self):
+        # Create result dictionary
         result = LocatedExternalDict()
-        result[ITEMS] = items = []
+        result[ITEM_COUNT] = 0
+        result[ITEMS] = []
+
+        # Get all IReport objects
         reports = component.getAllUtilitiesRegisteredFor(IReport)
+
+        # Put all reports into the result
         for report in reports:
-            items.append(to_external_object(report))
-        result[ITEM_COUNT] = result[TOTAL] = len(items)
+            result[ITEMS].append(to_external_object(report))
+            result[ITEM_COUNT] += 1
         return result

@@ -7,16 +7,12 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-
 from hamcrest import assert_that
 from hamcrest import has_entry
 from hamcrest import has_entries
 from hamcrest import has_items
 
-import unittest
-
 import json
-
 
 from zope.component import getGlobalSiteManager
 
@@ -36,14 +32,11 @@ from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
 
-@unittest.skip("in progres")
+
 class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
     """
     Test views for reports
     """
-
-    # Sample username for temp user requests
-    username = u"pgreazy"
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_all_report_get(self):
@@ -55,7 +48,7 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
         self._register_report(u"TestReport",
                               u"TestDescription",
                               ITestReportContext,
-                              u"AnotherTestPermission",
+                              u"TestPermission",
                               [u"csv", u"pdf"])
 
         self._register_report(u"AnotherTestReport",
@@ -70,14 +63,10 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
                               u"ThirdTestPermission",
                               [u"csv", u"pdf"])
 
-        # Create a sample user
-        with mock_dataserver.mock_db_trans(self.ds):
-            self._create_user(self.username)
-
         # Make sample request
         report_url = '/dataserver2/reporting/reports'
         _response = self.testapp.get(
-            report_url, extra_environ=self._make_extra_environ(self.username))
+            report_url, extra_environ=self._make_extra_environ())
 
         # Turn the response body into a dictionary
         res_dict = json.loads(_response.body)
