@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-.. $Id$
-"""
 
 from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
-logger = __import__('logging').getLogger(__name__)
+# disable: accessing protected members, too many methods
+# pylint: disable=W0212,R0904
 
-from hamcrest import assert_that
-from hamcrest import has_entry
 from hamcrest import is_not
-from hamcrest import contains_inanyorder
-from hamcrest import has_property
 from hamcrest import contains
+from hamcrest import has_entry
+from hamcrest import assert_that
+from hamcrest import has_property
+from hamcrest import contains_inanyorder
 
 from zope import interface
 
 from zope.configuration import config
 from zope.configuration import xmlconfig
+
+from nti.app.contenttypes.reports.decorators import _ReportContextDecorator
 
 from nti.contenttypes.reports.interfaces import IReportContext
 
@@ -27,7 +27,6 @@ from nti.contenttypes.reports.tests import ITestReportContext
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
 
-from nti.app.contenttypes.reports.decorators import _ReportContextDecorator
 
 # ZCML string to register three reports in a context
 HEAD_ZCML_STRING = u"""
@@ -62,7 +61,6 @@ HEAD_ZCML_STRING = u"""
             supported_types="csv" />
     </configure>
 </configure>
-
 """
 
 
