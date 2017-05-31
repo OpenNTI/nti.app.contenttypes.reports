@@ -33,6 +33,7 @@ from nti.externalization.externalization import to_external_object
 # Items for final result dictionary
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 ITEMS = StandardExternalFields.ITEMS
+TOTAL = StandardExternalFields.TOTAL
 
 
 @interface.implementer(IPathAdapter)
@@ -62,13 +63,13 @@ class RegisteredReportsView(AbstractAuthenticatedView):
         # Create result dictionary
         result = LocatedExternalDict()
         result[ITEM_COUNT] = 0
-        result[ITEMS] = []
+        result[ITEMS] = items = []
 
         # Get all IReport objects
         reports = component.getAllUtilitiesRegisteredFor(IReport)
 
         # Put all reports into the result
         for report in reports:
-            result[ITEMS].append(to_external_object(report))
-            result[ITEM_COUNT] += 1
+            items.append(to_external_object(report))
+        result[ITEM_COUNT] = result[TOTAL] = len(items)
         return result
