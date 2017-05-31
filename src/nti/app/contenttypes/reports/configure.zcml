@@ -16,4 +16,10 @@
                 for="nti.contenttypes.reports.interfaces.IReportContext"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
 
+	<!-- Traversing -->
+	<adapter name="reporting"
+			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
+			 factory=".views.ReportPathAdapter"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
 </configure>
