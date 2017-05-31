@@ -99,7 +99,7 @@ class TestReportDecoration(ReportsLayerTest):
         test_context = TestReportContext()
 
         # Create the decorator with dummy arguments
-        dec = _ReportContextDecorator(object(), object())
+        dec = _ReportContextDecorator(None, None)
         result = {}
 
         # Run the decorator on the context

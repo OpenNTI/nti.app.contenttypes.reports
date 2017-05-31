@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 import zope
 
+import zope.testing
+
 from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
@@ -18,11 +20,7 @@ from nti.testing.layers import ConfiguringLayerMixin
 class SharedConfiguringTestLayer(ZopeComponentLayer,
                                  ConfiguringLayerMixin):
 
-    set_up_packages = (
-        'nti.dataserver',
-        'nti.appserver',
-        'nti.contenttypes.reports',
-        'nti.app.contenttypes.reports')
+    set_up_packages = ('nti.app.contenttypes.reports',)
 
     @classmethod
     def setUp(cls):
@@ -46,8 +44,6 @@ import unittest
 
 from nti.testing.base import AbstractTestBase
 
-
 class ReportsLayerTest(unittest.TestCase):
-
     layer = SharedConfiguringTestLayer
     get_configuration_package = AbstractTestBase.get_configuration_package.__func__

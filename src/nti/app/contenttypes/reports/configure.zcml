@@ -9,21 +9,11 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 	
-	
-	<!-- Externalization -->
-	<include package="nti.externalization" file="meta.zcml" />
-	<include package="nti.externalization" />	
 	<include package="nti.contenttypes.reports" />
 	
-
 	<!-- Decorators -->
     <subscriber factory=".decorators._ReportContextDecorator"
                 for="nti.contenttypes.reports.interfaces.IReportContext"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
-
-	<adapter name="reporting"
-			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
-			 factory=".views.ReportPathAdapter"
-			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 </configure>
