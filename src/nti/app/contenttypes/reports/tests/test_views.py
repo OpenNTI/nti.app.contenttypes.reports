@@ -36,7 +36,6 @@ from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
 
-@unittest.skip("in progres")
 class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
     """
     Test views for reports
