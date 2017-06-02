@@ -18,13 +18,13 @@ import functools
 
 import json
 
-from zope.component.globalregistry import getGlobalSiteManager
-
 from zope import component
 from zope import interface
 
-from nti.contenttypes.reports.interfaces import IReportContext
+from zope.component.globalregistry import getGlobalSiteManager
+
 from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportContext
 
 from nti.contenttypes.reports.reports import BaseReport
 

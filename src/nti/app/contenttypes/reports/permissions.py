@@ -9,18 +9,17 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportPredicate
 
 from nti.dataserver.interfaces import IUser
 
 from nti.dataserver.authorization_acl import has_permission
 
-from nti.contenttypes.reports.interfaces import IReport
 
-
-@interface.implementer(IReportPredicate)
 @component.adapter(IReport, IUser)
-class BaseReportPermission():
+@interface.implementer(IReportPredicate)
+class BaseReportPermission(object):
     """
     Concrete class that evaluates
     user permissions on a context
@@ -31,5 +30,7 @@ class BaseReportPermission():
         pass
 
     def evaluate(self, report, context, user):
-        return True if report.permission is None or "" else has_permission(
-            report.permission, context, user)
+        if not report.permission:
+            return True
+        else:
+            return has_permission(report.permission, context, user)
