@@ -13,11 +13,12 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contenttypes.reports import MessageFactory as _
 
-from nti.contenttypes.reports.reports import evaluate_permission
-
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
-from nti.contenttypes.reports.interfaces import IReport, IReportContext
+from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportContext
+
+from nti.contenttypes.reports.reports import evaluate_permission
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator

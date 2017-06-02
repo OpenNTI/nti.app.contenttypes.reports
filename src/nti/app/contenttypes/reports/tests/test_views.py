@@ -16,8 +16,6 @@ import json
 
 from zope.component import getGlobalSiteManager
 
-from nti.contenttypes.reports.tests import ITestReportContext
-
 from nti.base._compat import text_
 
 from nti.contenttypes.reports.reports import BaseReport
@@ -29,6 +27,8 @@ from nti.app.contenttypes.reports.tests import ReportsLayerTest
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
+
+from nti.contenttypes.reports.tests import ITestReportContext
 
 
 class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
