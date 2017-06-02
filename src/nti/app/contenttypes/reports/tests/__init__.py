@@ -18,7 +18,8 @@ from nti.testing.layers import ConfiguringLayerMixin
 class SharedConfiguringTestLayer(ZopeComponentLayer,
                                  ConfiguringLayerMixin):
 
-    set_up_packages = ('nti.app.contenttypes.reports',)
+    set_up_packages = ('nti.contenttypes.reports',
+                       'nti.app.contenttypes.reports',)
 
     @classmethod
     def setUp(cls):
@@ -41,6 +42,7 @@ class SharedConfiguringTestLayer(ZopeComponentLayer,
 import unittest
 
 from nti.testing.base import AbstractTestBase
+
 
 class ReportsLayerTest(unittest.TestCase):
     layer = SharedConfiguringTestLayer

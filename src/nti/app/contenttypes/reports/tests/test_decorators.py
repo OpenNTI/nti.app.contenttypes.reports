@@ -7,61 +7,45 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+import functools
+import json
+
 from hamcrest import is_not
-from hamcrest import contains
 from hamcrest import has_entry
 from hamcrest import assert_that
-from hamcrest import has_property
-from hamcrest import contains_inanyorder
+from hamcrest import has_item
+from hamcrest import has_length
+from hamcrest import equal_to
+
+from zope.component.globalregistry import getGlobalSiteManager
 
 from zope import interface
-
-from zope.configuration import config
-from zope.configuration import xmlconfig
-
-from nti.app.contenttypes.reports.decorators import _ReportContextDecorator
+from zope import component
 
 from nti.contenttypes.reports.interfaces import IReportContext
+from nti.contenttypes.reports.interfaces import IReport
+
+from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.tests import ITestReportContext
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
 
+from nti.app.contenttypes.reports.permissions import evaluate_permission
 
-# ZCML string to register three reports in a context
-HEAD_ZCML_STRING = u"""
-<configure  xmlns="http://namespaces.zope.org/zope"
-            xmlns:zcml="http://namespaces.zope.org/zcml"
-            xmlns:rep="http://nextthought.com/reports">
+from nti.app.testing.decorators import WithSharedApplicationMockDS
 
-    <include package="zope.component" file="meta.zcml" />
-    <include package="zope.security" file="meta.zcml" />
-    <include package="zope.component" />
-    <include package="nti.contenttypes.reports" file="meta.zcml"/>
-    <include package="nti.contenttypes.reports" />
+from nti.app.testing.application_webtest import ApplicationLayerTest
 
-    <configure>
-        <rep:registerReport
-            name="TestReport"
-            description="TestDescription"
-            interface_context="nti.contenttypes.reports.tests.ITestReportContext"
-            permission="TestPermission"
-            supported_types="csv pdf" />
-        <rep:registerReport
-            name="AnotherTestReport"
-            description="AnotherTestDescription"
-            interface_context="nti.contenttypes.reports.tests.ITestReportContext"
-            permission="TestPermission"
-            supported_types="pdf" />
-        <rep:registerReport
-            name="ThirdTestReport"
-            description="IrrelevantContextDescription"
-            interface_context=".tests.test_decorators.ITestWrongReportContext"
-            permission="AnotherPermission"
-            supported_types="csv" />
-    </configure>
-</configure>
-"""
+from nti.dataserver.tests import mock_dataserver
+
+from nti.dataserver.authorization import ACT_NTI_ADMIN
+
+from nti.dataserver.contenttypes.note import Note
+
+from nti.dataserver.users.users import User
+
+from nti.externalization.oids import to_external_ntiid_oid
 
 
 class ITestWrongReportContext(IReportContext):
@@ -72,44 +56,113 @@ class ITestWrongReportContext(IReportContext):
 
 
 @interface.implementer(ITestReportContext)
-class TestReportContext():
+class TestReportContext(Note):
     """
     Concrete test class for ITestReportContext
     """
-    pass
 
 
-class TestReportDecoration(ReportsLayerTest):
+class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
     """
     Test the decoration of report links for a report
     context
     """
+    # Basic user with no permissions
+    basic_user = "pgreazy"
 
+    # Admin user
+    admin_user = "sjohnson@nextthought.com"
+
+    def _register_report(self, name, description,
+                         interface_context, permission, supported_types):
+        # Build a report factory
+        report = functools.partial(BaseReport,
+                                   name=name,
+                                   description=description,
+                                   interface_context=interface_context,
+                                   permission=permission,
+                                   supported_types=supported_types)
+
+        # Register it as a subscriber
+        getGlobalSiteManager().registerSubscriptionAdapter(
+            report, (interface_context,), IReport)
+
+    @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
-        # Create a context for the sample ZCML and run
-        # the sample string
-        context = config.ConfigurationMachine()
-        context.package = self.get_configuration_package()
-        xmlconfig.registerCommonDirectives(context)
-        xmlconfig.string(HEAD_ZCML_STRING, context)
 
-        # Create the sample context
-        test_context = TestReportContext()
+        # Register two reports: one we want to find and one
+        # we don't
+        self._register_report(u"TestReport",
+                              u"TestDescription",
+                              ITestReportContext,
+                              ACT_NTI_ADMIN.id,
+                              [u"csv"])
+        self._register_report(u"AnotherTestReport",
+                              u"AnotherTestDescription",
+                              ITestWrongReportContext,
+                              ACT_NTI_ADMIN.id,
+                              [u"csv", u"pdf"])
 
-        # Create the decorator with dummy arguments
-        dec = _ReportContextDecorator(None, None)
-        result = {}
+        # Create the user and the context
+        with mock_dataserver.mock_db_trans(self.ds):
+            # Create the sample context
+            _user = self._create_user(self.basic_user)
+            test_context = TestReportContext()
+            test_context.containerId = "tag:nti:foo"
+            test_context.creator = self.basic_user
+            _user.addContainedObject(test_context)
+            ntiid = to_external_ntiid_oid(test_context)
 
-        # Run the decorator on the context
-        dec._do_decorate_external(test_context, result)
+        # Ask for the context objects, hopefully
+        # with the report links
+        context_url = str('/dataserver2/Objects/' + ntiid)
+        environ = self._make_extra_environ(self.basic_user)
+        _response = self.testapp.get(context_url,
+                                     extra_environ=environ)
+
+        # Turn the response into something testable
+        res_dict = json.loads(_response.body)
 
         # Be sure it has come out correctly
-        assert_that(result,
+        assert_that(res_dict,
                     has_entry("Links",
-                              contains_inanyorder(
-                                  has_property("rel", "report-TestReport"),
-                                  has_property("rel", "report-AnotherTestReport"))))
-        assert_that(result,
+                              has_item(has_entry(
+                                  "rel", "report-TestReport"))))
+        assert_that(res_dict,
                     has_entry("Links",
-                              is_not(contains(
-                                  has_property("rel", "report-ThirdTestReport")))))
+                              is_not(has_item(
+                                  has_entry("rel", "report-AnotherTestReport")))))
+
+    @WithSharedApplicationMockDS(testapp=True, users=True)
+    def test_user_permissions(self):
+        with mock_dataserver.mock_db_trans(self.ds):
+            # Create the basic user
+            _user = self._create_user(self.basic_user)
+
+            # Create the test report context, and
+            # give the admin user access
+            test_context = TestReportContext()
+            test_context.creator = self.admin_user
+
+            # A report with admin permissions
+            # was already created above, so we don't need to
+            # make another one.
+
+            # Grab the report
+            report = component.subscribers((test_context,), IReport)
+
+            # Make sure we only got one
+            assert_that(report, has_length(1))
+
+            # Grab the first one
+            report = report[0]
+
+            # Test permissions for both users
+            admin_access = evaluate_permission(
+                report, test_context, User.get_user(self.admin_user))
+            basic_access = evaluate_permission(
+                report, test_context, User.get_user(self.basic_user))
+
+        # Compare values
+        assert_that(admin_access, equal_to(True))
+        assert_that(basic_access, equal_to(False))

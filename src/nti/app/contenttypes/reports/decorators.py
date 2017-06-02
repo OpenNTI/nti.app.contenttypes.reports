@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
+from pyramid.interfaces import IRequest
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -13,16 +14,19 @@ from nti.app.contenttypes.reports import MessageFactory as _
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
-from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReport, IReportContext
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.links.links import Link
 
+from nti.app.contenttypes.reports.permissions import evaluate_permission
+
 LINKS = StandardExternalFields.LINKS
 
 
+@component.adapter(IReportContext, IRequest)
 @interface.implementer(IExternalMappingDecorator)
 class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
@@ -38,7 +42,7 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
         reports = component.subscribers((context,), IReport)
         for report in reports:
             # Check user permission
-            if report.predicate(context, self.remoteUser):
+            if evaluate_permission(report, context, self.remoteUser):
                 # Add a link for each report
                 links.append(Link(context,
                                   rel="report-%s" % report.name,
