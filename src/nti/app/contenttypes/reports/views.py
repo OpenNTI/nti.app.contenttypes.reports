@@ -25,7 +25,6 @@ from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.contenttypes.reports.interfaces import IReport
 
-
 from nti.externalization.externalization import to_external_object
 
 from nti.externalization.interfaces import LocatedExternalDict

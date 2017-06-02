@@ -15,17 +15,7 @@ from nti.dataserver.authorization_acl import has_permission
 
 from nti.contenttypes.reports.interfaces import IReport
 
-
-class IReportPermission(interface.Interface):
-    """
-    Provides basic report permission checking
-    """
-    def evaluate(context, user):
-        """
-        Evaluate if the user has permissions
-        in this context
-        """
-
+from nti.app.contenttypes.reports.interfaces import IReportPermission
 
 @interface.implementer(IReportPermission)
 @component.adapter(IReport, IUser)
