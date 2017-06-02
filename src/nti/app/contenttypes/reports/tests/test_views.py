@@ -7,10 +7,10 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-from hamcrest import assert_that
 from hamcrest import has_entry
-from hamcrest import has_entries
 from hamcrest import has_items
+from hamcrest import assert_that
+from hamcrest import has_entries
 
 import json
 
@@ -18,19 +18,17 @@ from zope.component import getGlobalSiteManager
 
 from nti.contenttypes.reports.tests import ITestReportContext
 
-from nti.app.contenttypes.reports.tests import ReportsLayerTest
-
-from nti.app.testing.decorators import WithSharedApplicationMockDS
-
-from nti.dataserver.tests import mock_dataserver
-
-from nti.app.testing.application_webtest import ApplicationLayerTest
-
 from nti.base._compat import text_
 
 from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
+
+from nti.app.contenttypes.reports.tests import ReportsLayerTest
+
+from nti.app.testing.application_webtest import ApplicationLayerTest
+
+from nti.app.testing.decorators import WithSharedApplicationMockDS
 
 
 class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
@@ -40,7 +38,6 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_all_report_get(self):
-
         # Register three reports to pull
         # TODO: This should be run via zcml,
         # but a problem with contexts prevents us from

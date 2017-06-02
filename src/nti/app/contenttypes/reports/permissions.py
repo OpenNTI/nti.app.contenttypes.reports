@@ -6,16 +6,16 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import interface
 from zope import component
+from zope import interface
+
+from nti.app.contenttypes.reports.interfaces import IReportPermission
 
 from nti.dataserver.interfaces import IUser
 
 from nti.dataserver.authorization_acl import has_permission
 
 from nti.contenttypes.reports.interfaces import IReport
-
-from nti.app.contenttypes.reports.interfaces import IReportPermission
 
 
 @interface.implementer(IReportPermission)

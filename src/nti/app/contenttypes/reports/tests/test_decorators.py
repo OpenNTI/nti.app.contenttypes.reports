@@ -7,20 +7,21 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-import functools
-import json
-
 from hamcrest import is_not
-from hamcrest import has_entry
-from hamcrest import assert_that
-from hamcrest import has_item
-from hamcrest import has_length
 from hamcrest import equal_to
+from hamcrest import has_item
+from hamcrest import has_entry
+from hamcrest import has_length
+from hamcrest import assert_that
+
+import functools
+
+import json
 
 from zope.component.globalregistry import getGlobalSiteManager
 
-from zope import interface
 from zope import component
+from zope import interface
 
 from nti.contenttypes.reports.interfaces import IReportContext
 from nti.contenttypes.reports.interfaces import IReport
@@ -29,15 +30,7 @@ from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.tests import ITestReportContext
 
-from nti.app.contenttypes.reports.tests import ReportsLayerTest
-
 from nti.app.contenttypes.reports.permissions import evaluate_permission
-
-from nti.app.testing.decorators import WithSharedApplicationMockDS
-
-from nti.app.testing.application_webtest import ApplicationLayerTest
-
-from nti.dataserver.tests import mock_dataserver
 
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
@@ -46,6 +39,14 @@ from nti.dataserver.contenttypes.note import Note
 from nti.dataserver.users.users import User
 
 from nti.externalization.oids import to_external_ntiid_oid
+
+from nti.app.contenttypes.reports.tests import ReportsLayerTest
+
+from nti.app.testing.application_webtest import ApplicationLayerTest
+
+from nti.app.testing.decorators import WithSharedApplicationMockDS
+
+from nti.dataserver.tests import mock_dataserver
 
 
 class ITestWrongReportContext(IReportContext):
@@ -68,10 +69,10 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
     context
     """
     # Basic user with no permissions
-    basic_user = "pgreazy"
+    basic_user = u"pgreazy"
 
     # Admin user
-    admin_user = "sjohnson@nextthought.com"
+    admin_user = u"sjohnson@nextthought.com"
 
     def _register_report(self, name, description,
                          interface_context, permission, supported_types):
@@ -84,12 +85,12 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                                    supported_types=supported_types)
 
         # Register it as a subscriber
-        getGlobalSiteManager().registerSubscriptionAdapter(
-            report, (interface_context,), IReport)
+        getGlobalSiteManager().registerSubscriptionAdapter(report, 
+                                                           (interface_context,), 
+                                                           IReport)
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
-
         # Register two reports: one we want to find and one
         # we don't
         self._register_report(u"TestReport",
@@ -108,7 +109,7 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
             # Create the sample context
             _user = self._create_user(self.basic_user)
             test_context = TestReportContext()
-            test_context.containerId = "tag:nti:foo"
+            test_context.containerId = u"tag:nti:foo"
             test_context.creator = self.basic_user
             _user.addContainedObject(test_context)
             ntiid = to_external_ntiid_oid(test_context)
@@ -135,6 +136,7 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_user_permissions(self):
+
         with mock_dataserver.mock_db_trans(self.ds):
             # Create the basic user
             _user = self._create_user(self.basic_user)
@@ -158,10 +160,13 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
             report = report[0]
 
             # Test permissions for both users
-            admin_access = evaluate_permission(
-                report, test_context, User.get_user(self.admin_user))
-            basic_access = evaluate_permission(
-                report, test_context, User.get_user(self.basic_user))
+            admin_access = evaluate_permission(report, 
+                                               test_context, 
+                                               User.get_user(self.admin_user))
+
+            basic_access = evaluate_permission(report, 
+                                               test_context, 
+                                               User.get_user(self.basic_user))
 
         # Compare values
         assert_that(admin_access, equal_to(True))

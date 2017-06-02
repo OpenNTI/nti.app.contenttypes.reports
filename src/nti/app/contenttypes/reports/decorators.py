@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
-from pyramid.interfaces import IRequest
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -10,7 +9,11 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from pyramid.interfaces import IRequest
+
 from nti.app.contenttypes.reports import MessageFactory as _
+
+from nti.app.contenttypes.reports.permissions import evaluate_permission
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
@@ -20,8 +23,6 @@ from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.links.links import Link
-
-from nti.app.contenttypes.reports.permissions import evaluate_permission
 
 LINKS = StandardExternalFields.LINKS
 

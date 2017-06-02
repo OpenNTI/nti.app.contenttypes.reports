@@ -6,8 +6,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import interface
 from zope import component
+from zope import interface
 
 from zope.container.contained import Contained
 
@@ -21,26 +21,25 @@ from nti.dataserver.authorization import ACT_NTI_ADMIN
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
+from nti.contenttypes.reports.interfaces import IReport
+
 from nti.dataserver.interfaces import IDataserverFolder
 
-from nti.contenttypes.reports.interfaces import IReport
+from nti.externalization.externalization import to_external_object
 
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
-from nti.externalization.externalization import to_external_object
-
-# Items for final result dictionary
-ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 ITEMS = StandardExternalFields.ITEMS
 TOTAL = StandardExternalFields.TOTAL
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 
 @interface.implementer(IPathAdapter)
 @component.adapter(IDataserverFolder, IRequest)
 class ReportPathAdapter(Contained):
 
-    __name__ = u"reporting"
+    __name__ = "reporting"
 
     def __init__(self, context, request):
         self.context = context
@@ -66,7 +65,7 @@ class RegisteredReportsView(AbstractAuthenticatedView):
         result[ITEMS] = items = []
 
         # Get all IReport objects
-        reports = component.getAllUtilitiesRegisteredFor(IReport)
+        reports = list(component.getAllUtilitiesRegisteredFor(IReport))
 
         # Put all reports into the result
         for report in reports:
