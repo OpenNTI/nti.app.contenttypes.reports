@@ -17,6 +17,7 @@ from nti.contenttypes.reports.interfaces import IReport
 
 from nti.app.contenttypes.reports.interfaces import IReportPermission
 
+
 @interface.implementer(IReportPermission)
 @component.adapter(IReport, IUser)
 class BaseReportPermission():
