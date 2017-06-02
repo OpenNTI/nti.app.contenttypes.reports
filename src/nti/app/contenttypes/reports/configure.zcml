@@ -25,7 +25,7 @@
 
 	<!-- Report Permissions -->
 	<subscriber factory=".permissions.BaseReportPermission"
-			 	provides=".permissions.IReportPermission"
+			 	provides="nti.contenttypes.reports.interfaces.IReportPredicate"
 			 	for="nti.contenttypes.reports.interfaces.IReport
 			 	  	 nti.dataserver.interfaces.IUser" />
 </configure>

@@ -30,7 +30,7 @@ from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.tests import ITestReportContext
 
-from nti.app.contenttypes.reports.permissions import evaluate_permission
+from nti.contenttypes.reports.reports import evaluate_permission
 
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
@@ -85,8 +85,8 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                                    supported_types=supported_types)
 
         # Register it as a subscriber
-        getGlobalSiteManager().registerSubscriptionAdapter(report, 
-                                                           (interface_context,), 
+        getGlobalSiteManager().registerSubscriptionAdapter(report,
+                                                           (interface_context,),
                                                            IReport)
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
@@ -160,12 +160,12 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
             report = report[0]
 
             # Test permissions for both users
-            admin_access = evaluate_permission(report, 
-                                               test_context, 
+            admin_access = evaluate_permission(report,
+                                               test_context,
                                                User.get_user(self.admin_user))
 
-            basic_access = evaluate_permission(report, 
-                                               test_context, 
+            basic_access = evaluate_permission(report,
+                                               test_context,
                                                User.get_user(self.basic_user))
 
         # Compare values

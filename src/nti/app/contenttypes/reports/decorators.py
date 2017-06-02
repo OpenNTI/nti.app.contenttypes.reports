@@ -13,7 +13,7 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contenttypes.reports import MessageFactory as _
 
-from nti.app.contenttypes.reports.permissions import evaluate_permission
+from nti.contenttypes.reports.reports import evaluate_permission
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
