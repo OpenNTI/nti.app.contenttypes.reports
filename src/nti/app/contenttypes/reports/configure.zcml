@@ -13,7 +13,8 @@
 	
 	<!-- Decorators -->
     <subscriber factory=".decorators._ReportContextDecorator"
-                for="nti.contenttypes.reports.interfaces.IReportContext"
+                for="nti.contenttypes.reports.interfaces.IReportContext
+                	 pyramid.interfaces.IRequest"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
 
 	<!-- Traversing -->
@@ -22,4 +23,9 @@
 			 factory=".views.ReportPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
+	<!-- Report Permissions -->
+	<subscriber factory=".permissions.BaseReportPermission"
+			 	provides="nti.contenttypes.reports.interfaces.IReportPredicate"
+			 	for="nti.contenttypes.reports.interfaces.IReport
+			 	  	 nti.dataserver.interfaces.IUser" />
 </configure>

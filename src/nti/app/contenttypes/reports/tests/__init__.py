@@ -42,6 +42,7 @@ import unittest
 
 from nti.testing.base import AbstractTestBase
 
+
 class ReportsLayerTest(unittest.TestCase):
     layer = SharedConfiguringTestLayer
     get_configuration_package = AbstractTestBase.get_configuration_package.__func__
