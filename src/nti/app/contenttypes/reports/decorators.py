@@ -49,4 +49,4 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
                 links.append(Link(context,
                                   rel="report-%s" % report.name,
                                   elements=("@@" + report.name,),
-                                  title=_(report.name)))
+                                  title=_(report.title)))

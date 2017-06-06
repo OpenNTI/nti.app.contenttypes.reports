@@ -74,11 +74,12 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
     # Admin user
     admin_user = u"sjohnson@nextthought.com"
 
-    def _register_report(self, name, description,
+    def _register_report(self, name, title, description,
                          interface_context, permission, supported_types):
         # Build a report factory
         report = functools.partial(BaseReport,
                                    name=name,
+                                   title=title,
                                    description=description,
                                    interface_context=interface_context,
                                    permission=permission,
@@ -94,11 +95,13 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
         # Register two reports: one we want to find and one
         # we don't
         self._register_report(u"TestReport",
+                              u"Test Report",
                               u"TestDescription",
                               ITestReportContext,
                               ACT_NTI_ADMIN.id,
                               [u"csv"])
         self._register_report(u"AnotherTestReport",
+                              u"Another Test Report",
                               u"AnotherTestDescription",
                               ITestWrongReportContext,
                               ACT_NTI_ADMIN.id,
