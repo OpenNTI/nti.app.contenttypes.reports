@@ -10,7 +10,6 @@ __docformat__ = "restructuredtext en"
 from hamcrest import has_entry
 from hamcrest import has_items
 from hamcrest import assert_that
-from hamcrest import has_entries
 
 import json
 
@@ -43,18 +42,21 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
         # but a problem with contexts prevents us from
         # doing that at the moment
         self._register_report(u"TestReport",
+                              u"Test Report",
                               u"TestDescription",
                               ITestReportContext,
                               u"TestPermission",
                               [u"csv", u"pdf"])
 
         self._register_report(u"AnotherTestReport",
+                              u"Another Test Report",
                               u"AnotherTestDescription",
                               ITestReportContext,
                               u"AnotherTestPermission",
                               [u"csv", u"pdf"])
 
         self._register_report(u"ThirdTestReport",
+                              u"Third Test Report",
                               u"ThirdTestDescription",
                               ITestReportContext,
                               u"ThirdTestPermission",
@@ -70,13 +72,12 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
 
         # Be sure values exist correctly
         assert_that(res_dict,
-                    has_entries("ItemCount", 3,
-                                "Items", has_items(
+                    has_entry("Items", has_items(
                                     has_entry("name", "TestReport"),
                                     has_entry("name", "AnotherTestReport"),
                                     has_entry("name", "ThirdTestReport"))))
 
-    def _register_report(self, name, description,
+    def _register_report(self, name, title, description,
                          interface_context, permission, supported_types):
         """
         Manual and temporary registration of reports
@@ -86,6 +87,7 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
 
         # Create the Report object to be used as a subscriber
         factory = BaseReport(name=text_(name),
+                             title=text_(title),
                              description=text_(description),
                              interface_context=interface_context,
                              permission=text_(permission),
