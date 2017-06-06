@@ -37,10 +37,6 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_all_report_get(self):
-        # Register three reports to pull
-        # TODO: This should be run via zcml,
-        # but a problem with contexts prevents us from
-        # doing that at the moment
         self._register_report(u"TestReport",
                               u"Test Report",
                               u"TestDescription",
