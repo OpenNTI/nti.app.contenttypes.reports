@@ -10,7 +10,6 @@ __docformat__ = "restructuredtext en"
 from hamcrest import has_entry
 from hamcrest import has_items
 from hamcrest import assert_that
-from hamcrest import has_entries
 
 import json
 
@@ -70,8 +69,7 @@ class TestReportViews(ApplicationLayerTest, ReportsLayerTest):
 
         # Be sure values exist correctly
         assert_that(res_dict,
-                    has_entries("ItemCount", 3,
-                                "Items", has_items(
+                    has_entry("Items", has_items(
                                     has_entry("name", "TestReport"),
                                     has_entry("name", "AnotherTestReport"),
                                     has_entry("name", "ThirdTestReport"))))

@@ -11,7 +11,7 @@ from hamcrest import is_not
 from hamcrest import equal_to
 from hamcrest import has_item
 from hamcrest import has_entry
-from hamcrest import has_length
+from hamcrest import not_none
 from hamcrest import assert_that
 
 import functools
@@ -154,7 +154,7 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
             report = component.subscribers((test_context,), IReport)
 
             # Make sure we only got one
-            assert_that(report, has_length(1))
+            assert_that(report, not_none())
 
             # Grab the first one
             report = report[0]
