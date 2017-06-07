@@ -25,6 +25,7 @@ from zope.component.globalregistry import getGlobalSiteManager
 
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportContext
+from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
 from nti.contenttypes.reports.reports import BaseReport
 
@@ -55,6 +56,13 @@ class ITestWrongReportContext(IReportContext):
     aren't pulling extra reports
     """
 
+@interface.implementer(IReportAvailablePredicate)
+class TestPredicate():
+    """
+    Test predicate
+    """
+    def evaluate(self, report, context, user):
+        return context if context.containerId == u"tag:nti:foo" else False
 
 @interface.implementer(ITestReportContext)
 class TestReportContext(Note):
@@ -92,9 +100,6 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                                                            (interface_context,),
                                                            IReport)
     
-    def _test_condition(self, context, report, user):
-        return context if context.containerId == u"tag:nti:foo" else False
-    
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
         # Register two reports: one we want to find and one
@@ -105,14 +110,14 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                               ITestReportContext,
                               ACT_NTI_ADMIN.id,
                               [u"csv"],
-                              condition=self._test_condition)
+                              condition=TestPredicate)
         self._register_report(u"AnotherTestReport",
                               u"Another Test Report",
                               u"AnotherTestDescription",
                               ITestWrongReportContext,
                               ACT_NTI_ADMIN.id,
                               [u"csv", u"pdf"],
-                              condition=self._test_condition)
+                              condition=TestPredicate)
 
         # Create the user and the contexts
         with mock_dataserver.mock_db_trans(self.ds):

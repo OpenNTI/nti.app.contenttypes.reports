@@ -39,7 +39,7 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
         return self._is_authenticated
 
     def _check_condition(self, condition, context, report, user):
-        return context if condition is None else condition(context, report, user)
+        return context if condition is None else condition().evaluate(report, context, user)
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
