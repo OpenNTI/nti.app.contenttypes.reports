@@ -38,15 +38,19 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _predicate(self, context, result):
         return self._is_authenticated
 
+    def _check_condition(self, condition, context, report, user):
+        return context if condition is None else condition(context, report, user)
+
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
         # Get all IReport objects subscribed to this report context
         reports = component.subscribers((context,), IReport)
         for report in reports:
-            # Check user permission
-            if evaluate_permission(report, context, self.remoteUser):
+            # Check user permission and condition
+            insert_into = self._check_condition(report.condition, context, report, self.remoteUser)
+            if insert_into and evaluate_permission(report, context, self.remoteUser):
                 # Add a link for each report
-                links.append(Link(context,
+                links.append(Link(insert_into,
                                   rel="report-%s" % report.name,
                                   elements=("@@" + report.name,),
                                   title=_(report.title)))

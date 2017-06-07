@@ -7,7 +7,7 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-from hamcrest import is_not
+from hamcrest import is_not as does_not
 from hamcrest import equal_to
 from hamcrest import has_item
 from hamcrest import has_entry
@@ -75,7 +75,8 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
     admin_user = u"sjohnson@nextthought.com"
 
     def _register_report(self, name, title, description,
-                         interface_context, permission, supported_types):
+                         interface_context, permission, supported_types,
+                         condition=None):
         # Build a report factory
         report = functools.partial(BaseReport,
                                    name=name,
@@ -83,13 +84,17 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                                    description=description,
                                    interface_context=interface_context,
                                    permission=permission,
-                                   supported_types=supported_types)
+                                   supported_types=supported_types,
+                                   condition=condition)
 
         # Register it as a subscriber
         getGlobalSiteManager().registerSubscriptionAdapter(report,
                                                            (interface_context,),
                                                            IReport)
-
+    
+    def _test_condition(self, context, report, user):
+        return context if context.containerId == u"tag:nti:foo" else False
+    
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_report_decoration(self):
         # Register two reports: one we want to find and one
@@ -99,23 +104,32 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                               u"TestDescription",
                               ITestReportContext,
                               ACT_NTI_ADMIN.id,
-                              [u"csv"])
+                              [u"csv"],
+                              condition=self._test_condition)
         self._register_report(u"AnotherTestReport",
                               u"Another Test Report",
                               u"AnotherTestDescription",
                               ITestWrongReportContext,
                               ACT_NTI_ADMIN.id,
-                              [u"csv", u"pdf"])
+                              [u"csv", u"pdf"],
+                              condition=self._test_condition)
 
-        # Create the user and the context
+        # Create the user and the contexts
         with mock_dataserver.mock_db_trans(self.ds):
-            # Create the sample context
+            # This test_context should have reports in decorators
             _user = self._create_user(self.basic_user)
             test_context = TestReportContext()
             test_context.containerId = u"tag:nti:foo"
             test_context.creator = self.basic_user
             _user.addContainedObject(test_context)
             ntiid = to_external_ntiid_oid(test_context)
+            
+            # This one should not
+            second_context = TestReportContext()
+            second_context.containerId = u"not:tag:nti:foo"
+            second_context.creator=self.basic_user
+            _user.addContainedObject(second_context)
+            second_ntiid = to_external_ntiid_oid(second_context)
 
         # Ask for the context objects, hopefully
         # with the report links
@@ -134,8 +148,21 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
                                   "rel", "report-TestReport"))))
         assert_that(res_dict,
                     has_entry("Links",
-                              is_not(has_item(
+                              does_not(has_item(
                                   has_entry("rel", "report-AnotherTestReport")))))
+        
+        # Get the second context, and test it does not have reports as decorators
+        context_url = str('/dataserver2/Objects/' + second_ntiid)
+        _response = self.testapp.get(context_url,
+                                     extra_environ=environ)
+        
+        res_dict = json.loads(_response.body)
+        
+        # Be sure it has come out correctly
+        assert_that(res_dict,
+                    has_entry("Links",
+                              does_not(has_item(has_entry(
+                                  "rel", "report-TestReport")))))
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_user_permissions(self):
