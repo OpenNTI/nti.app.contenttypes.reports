@@ -35,22 +35,32 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     Decorate report contexts with their IReport links
     """
 
+    environment = None
+
     def _predicate(self, context, result):
         return self._is_authenticated
 
     def _check_condition(self, condition, context, report, user):
-        return context if condition is None else condition().evaluate(report, context, user)
+        self.environment = condition()
+        return self.environment.evaluate(report, context, user)
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
+        
         # Get all IReport objects subscribed to this report context
         reports = component.subscribers((context,), IReport)
         for report in reports:
+            
             # Check user permission and condition
-            insert_into = self._check_condition(report.condition, context, report, self.remoteUser)
-            if insert_into and evaluate_permission(report, context, self.remoteUser):
-                # Add a link for each report
-                links.append(Link(insert_into,
-                                  rel="report-%s" % report.name,
-                                  elements=("@@" + report.name,),
-                                  title=_(report.title)))
+            available = self._check_condition(report.condition, 
+                                              context, 
+                                              report, 
+                                              self.remoteUser)
+            
+            if available and evaluate_permission(report, context, self.remoteUser):
+                    self.environment.set_link_elements(report, context)
+                    # Add a link for each report
+                    links.append(Link(self.environment.context,
+                                      rel=self.environment.rel,
+                                      elements=self.environment.elements,
+                                      title=_(report.title)))

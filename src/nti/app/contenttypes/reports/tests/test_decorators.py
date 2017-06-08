@@ -25,9 +25,9 @@ from zope.component.globalregistry import getGlobalSiteManager
 
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportContext
-from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
 from nti.contenttypes.reports.reports import BaseReport
+from nti.contenttypes.reports.reports import BaseReportAvailablePredicate
 
 from nti.contenttypes.reports.tests import ITestReportContext
 
@@ -56,13 +56,12 @@ class ITestWrongReportContext(IReportContext):
     aren't pulling extra reports
     """
 
-@interface.implementer(IReportAvailablePredicate)
-class TestPredicate():
+class TestPredicate(BaseReportAvailablePredicate):
     """
     Test predicate
     """
     def evaluate(self, report, context, user):
-        return context if context.containerId == u"tag:nti:foo" else False
+        return context.containerId == u"tag:nti:foo"
 
 @interface.implementer(ITestReportContext)
 class TestReportContext(Note):
@@ -145,7 +144,7 @@ class TestReportDecoration(ApplicationLayerTest, ReportsLayerTest):
 
         # Turn the response into something testable
         res_dict = json.loads(_response.body)
-
+        
         # Be sure it has come out correctly
         assert_that(res_dict,
                     has_entry("Links",
