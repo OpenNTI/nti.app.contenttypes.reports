@@ -46,18 +46,19 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
-        
+
         # Get all IReport objects subscribed to this report context
         reports = component.subscribers((context,), IReport)
         for report in reports:
-            
+
             # Check user permission and condition
-            available = self._check_condition(report.condition, 
-                                              context, 
-                                              report, 
+            available = self._check_condition(report.condition,
+                                              context,
+                                              report,
                                               self.remoteUser)
-            
-            if available and evaluate_permission(report, context, self.remoteUser):
+
+            if available and evaluate_permission(
+                    report, context, self.remoteUser):
                     self.environment.set_link_elements(report, context)
                     # Add a link for each report
                     links.append(Link(self.environment.context,
