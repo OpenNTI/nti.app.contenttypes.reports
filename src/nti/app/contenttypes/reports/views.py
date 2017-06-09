@@ -63,10 +63,8 @@ class RegisteredReportsView(AbstractAuthenticatedView):
         result = LocatedExternalDict()
         result[ITEM_COUNT] = 0
         result[ITEMS] = items = []
-
         # Get all IReport objects
         reports = list(component.getAllUtilitiesRegisteredFor(IReport))
-
         # Put all reports into the result
         for report in reports:
             items.append(to_external_object(report))

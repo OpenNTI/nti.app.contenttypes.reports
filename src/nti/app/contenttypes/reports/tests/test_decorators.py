@@ -19,12 +19,7 @@ import json
 from zope import component
 from zope import interface
 
-from nti.app.contenttypes.reports.tests import ReportsLayerTest
-
-from nti.app.testing.decorators import WithSharedApplicationMockDS
-
 from nti.contenttypes.reports.interfaces import IReport
-from nti.contenttypes.reports.interfaces import IReportContext
 
 from nti.contenttypes.reports.tests import ITestReportContext
 from nti.contenttypes.reports.tests import ITestSecondReportContext
@@ -38,6 +33,10 @@ from nti.dataserver.users.users import User
 from nti.dataserver.tests import mock_dataserver
 
 from nti.externalization.oids import to_external_ntiid_oid
+
+from nti.app.contenttypes.reports.tests import ReportsLayerTest
+
+from nti.app.testing.decorators import WithSharedApplicationMockDS
 
 
 @interface.implementer(ITestReportContext)

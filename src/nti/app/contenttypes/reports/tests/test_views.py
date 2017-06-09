@@ -28,8 +28,8 @@ class TestReportViews(ReportsLayerTest):
 
         # Make sample request
         report_url = '/dataserver2/reporting/reports'
-        _response = self.testapp.get(
-            report_url, extra_environ=self._make_extra_environ())
+        _response = self.testapp.get(report_url,
+                                     extra_environ=self._make_extra_environ())
 
         # Turn the response body into a dictionary
         res_dict = json.loads(_response.body)
