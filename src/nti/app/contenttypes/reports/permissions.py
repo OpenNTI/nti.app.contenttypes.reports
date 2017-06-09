@@ -12,9 +12,9 @@ from zope import interface
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportPredicate
 
-from nti.dataserver.interfaces import IUser
-
 from nti.dataserver.authorization_acl import has_permission
+
+from nti.dataserver.interfaces import IUser
 
 
 @component.adapter(IReport, IUser)
