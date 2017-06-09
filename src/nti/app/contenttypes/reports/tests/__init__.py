@@ -17,11 +17,6 @@ from zope import component
 
 from zope.component import getGlobalSiteManager
 
-from nti.analytics.database.interfaces import IAnalyticsDB
-from nti.analytics.database.database import AnalyticsDB
-
-from nti.app.testing.application_webtest import ApplicationLayerTest
-
 from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
@@ -32,6 +27,8 @@ from nti.contenttypes.reports.tests import ITestSecondReportContext
 from nti.contenttypes.reports.reports import BaseReportAvailablePredicate
 
 from nti.dataserver.authorization import ACT_NTI_ADMIN
+
+from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.testing.base import AbstractTestBase
 
@@ -48,7 +45,9 @@ class TestPredicate(BaseReportAvailablePredicate):
 class ReportsLayerTest(ApplicationLayerTest):
 
     get_configuration_package = AbstractTestBase.get_configuration_package.__func__
+
     set_up_packages = ('nti.app.contenttypes.reports',)
+
     utils = []
     factory = None
 
@@ -57,9 +56,6 @@ class ReportsLayerTest(ApplicationLayerTest):
         """
         Set up environment for app layer report testing
         """
-        self.db = AnalyticsDB(dburi='sqlite://')
-        component.getGlobalSiteManager().registerUtility(self.db, IAnalyticsDB)
-
         def _register_report(name, title, description,
                              contexts, permission, supported_types, condition):
             """
@@ -122,18 +118,15 @@ class ReportsLayerTest(ApplicationLayerTest):
         subscribers
         """
         sm = component.getGlobalSiteManager()
-        sm.unregisterUtility(self.db)
         for util in self.utils:
-            sm.unregisterUtility(
-                component=util,
-                provided=IReport,
-                name=util.name)
-        sm.unregisterSubscriptionAdapter(
-            factory=self.factory, required=(
-                ITestReportContext,), provided=IReport)
-        sm.unregisterSubscriptionAdapter(
-            factory=self.factory, required=(
-                ITestSecondReportContext,), provided=IReport)
+            sm.unregisterUtility(component=util,
+                                 provided=IReport,
+                                 name=util.name)
 
+        sm.unregisterSubscriptionAdapter(factory=self.factory,
+                                         required=(ITestReportContext,),
+                                         provided=IReport)
 
-
+        sm.unregisterSubscriptionAdapter(factory=self.factory,
+                                         required=(ITestSecondReportContext,),
+                                         provided=IReport)
