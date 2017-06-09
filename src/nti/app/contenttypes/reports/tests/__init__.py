@@ -61,7 +61,7 @@ class ReportsLayerTest(ApplicationLayerTest):
         component.getGlobalSiteManager().registerUtility(self.db, IAnalyticsDB)
 
         def _register_report(name, title, description,
-                             interface_context, permission, supported_types, condition):
+                             contexts, permission, supported_types, condition):
             """
             Manual and temporary registration of reports
             """
@@ -71,7 +71,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                        name=name,
                                        title=title,
                                        description=description,
-                                       interface_context=interface_context,
+                                       contexts=contexts,
                                        permission=permission,
                                        supported_types=supported_types,
                                        condition=condition)
@@ -81,7 +81,7 @@ class ReportsLayerTest(ApplicationLayerTest):
             # Register as a utility
             getGlobalSiteManager().registerUtility(report_obj, IReport, name)
 
-            for interface in interface_context:
+            for interface in contexts:
                 # Register it as a subscriber
                 getGlobalSiteManager().registerSubscriptionAdapter(report,
                                                                    (interface,),
