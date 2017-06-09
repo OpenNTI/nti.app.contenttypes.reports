@@ -19,7 +19,7 @@ from nti.dataserver.interfaces import IUser
 
 @component.adapter(IReport, IUser)
 @interface.implementer(IReportPredicate)
-class BaseReportPermission(object):
+class DefaultReportPermission(object):
     """
     Concrete class that evaluates
     user permissions on a context
@@ -34,3 +34,5 @@ class BaseReportPermission(object):
             return True
         else:
             return has_permission(report.permission, context, user)
+
+BaseReportPermission = DefaultReportPermission  # BWC

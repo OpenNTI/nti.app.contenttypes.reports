@@ -7,13 +7,15 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-from hamcrest import is_not as does_not
+from hamcrest import is_not
 from hamcrest import equal_to
 from hamcrest import has_item
 from hamcrest import has_entry
-from hamcrest import not_none
+from hamcrest import has_length
 from hamcrest import assert_that
-
+from hamcrest import greater_than
+does_not = is_not
+ 
 import json
 
 from zope import component
@@ -101,8 +103,7 @@ class TestReportDecoration(ReportsLayerTest):
 
         assert_that(res_dict,
                     has_entry("Links",
-                              has_item(has_entry(
-                                  "rel", "report-TestReport"))))
+                              has_item(has_entry("rel", "report-TestReport"))))
         assert_that(res_dict,
                     has_entry("Links",
                               (has_item(
@@ -116,8 +117,7 @@ class TestReportDecoration(ReportsLayerTest):
 
         assert_that(res_dict,
                     has_entry("Links",
-                              does_not(has_item(has_entry(
-                                  "rel", "report-TestReport")))))
+                              does_not(has_item(has_entry("rel", "report-TestReport")))))
 
         context_url = str('/dataserver2/Objects/' + third_ntiid)
         _response = self.testapp.get(context_url,
@@ -127,8 +127,7 @@ class TestReportDecoration(ReportsLayerTest):
 
         assert_that(res_dict,
                     has_entry("Links",
-                              (has_item(has_entry(
-                                  "rel", "report-AnotherTestReport")))))
+                              (has_item(has_entry("rel", "report-AnotherTestReport")))))
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_user_permissions(self):
@@ -144,11 +143,9 @@ class TestReportDecoration(ReportsLayerTest):
             test_context.creator = self.admin_user
 
             report = component.subscribers((test_context,), IReport)
-
-            assert_that(report, not_none())
+            assert_that(report, has_length(greater_than(0)))
 
             report = report[0]
-
             admin_access = evaluate_permission(report,
                                                test_context,
                                                User.get_user(self.admin_user))

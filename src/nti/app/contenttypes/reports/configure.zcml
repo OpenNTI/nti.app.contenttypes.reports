@@ -24,8 +24,9 @@
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 	<!-- Report Permissions -->
-	<subscriber factory=".permissions.BaseReportPermission"
+	<subscriber factory=".permissions.DefaultReportPermission"
 			 	provides="nti.contenttypes.reports.interfaces.IReportPredicate"
 			 	for="nti.contenttypes.reports.interfaces.IReport
 			 	  	 nti.dataserver.interfaces.IUser" />
+
 </configure>
