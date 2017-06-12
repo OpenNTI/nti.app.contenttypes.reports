@@ -28,8 +28,6 @@ from nti.contenttypes.reports.tests import ITestSecondReportContext
 
 from nti.contenttypes.reports.reports import evaluate_permission
 
-from nti.dataserver.contenttypes.note import Note
-
 from nti.dataserver.users.users import User
 
 from nti.dataserver.tests import mock_dataserver
@@ -37,22 +35,10 @@ from nti.dataserver.tests import mock_dataserver
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
+from nti.app.contenttypes.reports.tests import TestReportContext
+from nti.app.contenttypes.reports.tests import SecondReportContext
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
-
-
-@interface.implementer(ITestReportContext)
-class TestReportContext(Note):
-    """
-    Concrete test class for ITestReportContext
-    """
-
-
-@interface.implementer(ITestSecondReportContext)
-class SecondReportContext(Note):
-    """
-    Concrete test class for ITestSecondReportContext
-    """
 
 
 class TestReportDecoration(ReportsLayerTest):
