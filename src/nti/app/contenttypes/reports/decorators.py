@@ -51,7 +51,7 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
                 and evaluate_permission(report, context, self.remoteUser):
                 
                 self.environment = report.link_provider()
-                self.environment.set_link_elements(report, context)
+                self.environment.set_link_elements(report, context, self.remoteUser)
                 # Add a link for each report
                 links.append(Link(self.environment.context,
                                   rel=self.environment.rel,
