@@ -14,29 +14,49 @@ import zope
 import zope.testing
 
 from zope import component
+from zope import interface
 
 from zope.component import getGlobalSiteManager
 
 from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
+
+from nti.contenttypes.reports.reports import DefaultReportLinkProvider
 
 from nti.contenttypes.reports.tests import ITestReportContext
 from nti.contenttypes.reports.tests import ITestSecondReportContext
 
-from nti.contenttypes.reports.reports import BaseReportAvailablePredicate
-
 from nti.dataserver.authorization import ACT_NTI_ADMIN
+
+from nti.dataserver.contenttypes.note import Note
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.testing.base import AbstractTestBase
 
+@interface.implementer(ITestReportContext)
+class TestReportContext(Note):
+    """
+    Concrete test class for ITestReportContext
+    """
 
-class TestPredicate(BaseReportAvailablePredicate):
+
+@interface.implementer(ITestSecondReportContext)
+class SecondReportContext(Note):
+    """
+    Concrete test class for ITestSecondReportContext
+    """
+
+@interface.implementer(IReportAvailablePredicate)
+class TestPredicate():
     """
     Test predicate
     """
+    
+    def __init__(self, *args, **kwargs):
+        pass
 
     def evaluate(self, report, context, user):
         return context.containerId == u"tag:nti:foo"
@@ -50,6 +70,7 @@ class ReportsLayerTest(ApplicationLayerTest):
 
     utils = []
     factory = None
+    predicate = None
 
     @classmethod
     def setUp(self):
@@ -57,7 +78,7 @@ class ReportsLayerTest(ApplicationLayerTest):
         Set up environment for app layer report testing
         """
         def _register_report(name, title, description,
-                             contexts, permission, supported_types, condition):
+                             contexts, permission, supported_types, link_provider):
             """
             Manual and temporary registration of reports
             """
@@ -70,7 +91,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                        contexts=contexts,
                                        permission=permission,
                                        supported_types=supported_types,
-                                       condition=condition)
+                                       link_provider=link_provider)
             self.factory = report
 
             report_obj = report()
@@ -92,7 +113,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
                                            [u"csv", u"pdf"],
-                                           TestPredicate))
+                                           DefaultReportLinkProvider))
 
         self.utils.append(_register_report(u"AnotherTestReport",
                                            u"Another Test Report",
@@ -101,7 +122,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                             ITestSecondReportContext),
                                            ACT_NTI_ADMIN.id,
                                            [u"csv", u"pdf"],
-                                           TestPredicate))
+                                           DefaultReportLinkProvider))
 
         self.utils.append(_register_report(u"ThirdTestReport",
                                            u"Third Test Report",
@@ -109,7 +130,11 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
                                            [u"csv", u"pdf"],
-                                           TestPredicate))
+                                           DefaultReportLinkProvider))
+        
+        self.predicate = functools.partial(TestPredicate)
+        
+        getGlobalSiteManager().registerSubscriptionAdapter(self.predicate, (TestReportContext,), IReportAvailablePredicate)
 
     @classmethod
     def tearDown(self):
@@ -130,3 +155,7 @@ class ReportsLayerTest(ApplicationLayerTest):
         sm.unregisterSubscriptionAdapter(factory=self.factory,
                                          required=(ITestSecondReportContext,),
                                          provided=IReport)
+        
+        sm.unregisterSubscriptionAdapter(factory=self.predicate,
+                                         required=(TestReportContext,),
+                                         provided=IReportAvailablePredicate)

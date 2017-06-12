@@ -19,6 +19,7 @@ from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportContext
 
 from nti.contenttypes.reports.reports import evaluate_permission
+from nti.contenttypes.reports.reports import evaluate_predicate
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
@@ -40,24 +41,17 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _predicate(self, context, result):
         return self._is_authenticated
 
-    def _check_condition(self, condition, context, report, user):
-        self.environment = condition()
-        return self.environment.evaluate(report, context, user)
-
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
         # Get all IReport objects subscribed to this report context
         reports = component.subscribers((context,), IReport)
         for report in reports:
-            # Check user permission and condition
-            available = self._check_condition(report.condition,
-                                              context,
-                                              report,
-                                              self.remoteUser)
 
-            if      available \
+            if      evaluate_predicate(report, context, self.remoteUser) \
                 and evaluate_permission(report, context, self.remoteUser):
-                self.environment.set_link_elements(report, context)
+                
+                self.environment = report.link_provider()
+                self.environment.set_link_elements(report, context, self.remoteUser)
                 # Add a link for each report
                 links.append(Link(self.environment.context,
                                   rel=self.environment.rel,
