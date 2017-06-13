@@ -56,6 +56,6 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
                 if not provider:
                     provider = component.queryAdapter(report, IReportLinkProvider, name=report.name)
                     if not provider:
-                        provider = component.queryAdapter(report, IReportLinkProvider, name="default")
+                        provider = component.queryAdapter(report, IReportLinkProvider)
                 
                 links.append(provider.link(report, context, self.remoteUser))
