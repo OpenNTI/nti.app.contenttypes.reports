@@ -18,12 +18,14 @@ from zope import interface
 
 from zope.component import getGlobalSiteManager
 
+from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
+
 from nti.contenttypes.reports.reports import BaseReport
 
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
-from nti.contenttypes.reports.reports import DefaultReportLinkProvider
+from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
 
 from nti.contenttypes.reports.tests import ITestReportContext
 from nti.contenttypes.reports.tests import ITestSecondReportContext
@@ -71,6 +73,7 @@ class ReportsLayerTest(ApplicationLayerTest):
     utils = []
     factory = None
     predicate = None
+    link_provider = None
 
     @classmethod
     def setUp(self):
@@ -78,7 +81,7 @@ class ReportsLayerTest(ApplicationLayerTest):
         Set up environment for app layer report testing
         """
         def _register_report(name, title, description,
-                             contexts, permission, supported_types, link_provider):
+                             contexts, permission, supported_types):
             """
             Manual and temporary registration of reports
             """
@@ -90,8 +93,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                        description=description,
                                        contexts=contexts,
                                        permission=permission,
-                                       supported_types=supported_types,
-                                       link_provider=link_provider)
+                                       supported_types=supported_types)
             self.factory = report
 
             report_obj = report()
@@ -112,8 +114,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            u"TestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"],
-                                           DefaultReportLinkProvider))
+                                           [u"csv", u"pdf"]))
 
         self.utils.append(_register_report(u"AnotherTestReport",
                                            u"Another Test Report",
@@ -121,20 +122,23 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            (ITestReportContext,
                                             ITestSecondReportContext),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"],
-                                           DefaultReportLinkProvider))
+                                           [u"csv", u"pdf"]))
 
         self.utils.append(_register_report(u"ThirdTestReport",
                                            u"Third Test Report",
                                            u"ThirdTestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"],
-                                           DefaultReportLinkProvider))
+                                           [u"csv", u"pdf"]))
         
         self.predicate = functools.partial(TestPredicate)
         
         getGlobalSiteManager().registerSubscriptionAdapter(self.predicate, (TestReportContext,), IReportAvailablePredicate)
+        
+        self.link_provider = functools.partial(DefaultReportLinkProvider)
+        
+        getGlobalSiteManager().registerSubscriptionAdapter(self.link_provider, (BaseReport,), IReportLinkProvider)
+        
 
     @classmethod
     def tearDown(self):
@@ -159,3 +163,8 @@ class ReportsLayerTest(ApplicationLayerTest):
         sm.unregisterSubscriptionAdapter(factory=self.predicate,
                                          required=(TestReportContext,),
                                          provided=IReportAvailablePredicate)
+        
+        sm.unregisterSubscriptionAdapter(factory=self.link_provider,
+                                         required=(BaseReport,),
+                                         provided=IReportLinkProvider)
+        

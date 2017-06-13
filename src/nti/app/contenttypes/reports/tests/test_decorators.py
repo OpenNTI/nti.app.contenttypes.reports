@@ -108,7 +108,7 @@ class TestReportDecoration(ReportsLayerTest):
         context_url = str('/dataserver2/Objects/' + third_ntiid)
         _response = self.testapp.get(context_url,
                                      extra_environ=environ)
-
+        
         res_dict = json.loads(_response.body)
 
         assert_that(res_dict,

@@ -13,6 +13,8 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contenttypes.reports import MessageFactory as _
 
+from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
+
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
 from nti.contenttypes.reports.interfaces import IReport
@@ -36,8 +38,6 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     Decorate report contexts with their IReport links
     """
 
-    environment = None
-
     def _predicate(self, context, result):
         return self._is_authenticated
 
@@ -50,10 +50,9 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
             if      evaluate_predicate(report, context, self.remoteUser) \
                 and evaluate_permission(report, context, self.remoteUser):
                 
-                self.environment = report.link_provider()
-                self.environment.set_link_elements(report, context, self.remoteUser)
-                # Add a link for each report
-                links.append(Link(self.environment.context,
-                                  rel=self.environment.rel,
-                                  elements=self.environment.elements,
-                                  title=_(report.title)))
+                for provider in component.subscribers((report,), IReportLinkProvider):
+                    links.append(provider.link(report, context))
+                
+                for provider in component.subscribers((report, self.request), IReportLinkProvider):
+                    links.append(provider.link(report, context, self.remoteUser))
+                
