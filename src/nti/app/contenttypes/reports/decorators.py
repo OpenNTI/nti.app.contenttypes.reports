@@ -11,11 +11,7 @@ from zope import interface
 
 from pyramid.interfaces import IRequest
 
-from nti.app.contenttypes.reports import MessageFactory as _
-
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
-
-from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
@@ -27,8 +23,6 @@ from nti.contenttypes.reports.reports import evaluate_predicate
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
-
-from nti.links.links import Link
 
 LINKS = StandardExternalFields.LINKS
 
@@ -43,19 +37,22 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _predicate(self, context, result):
         return self._is_authenticated
 
+    def _set_link(self, report, context, links, objects, name=''):
+        provider = component.queryMultiAdapter(objects,
+                                               IReportLinkProvider,
+                                               name=name)
+        if provider is not None:
+            links.append(provider.link(report, context, self.remoteUser))
+
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
         # Get all IReport objects subscribed to this report context
-        reports = component.subscribers((context,), IReport)
-        for report in reports:
-
-            if      evaluate_predicate(report, context, self.remoteUser) \
-                and evaluate_permission(report, context, self.remoteUser):
-                
-                provider = component.queryMultiAdapter((report,self.request), IReportLinkProvider, name=report.name)
-                if not provider:
-                    provider = component.queryAdapter(report, IReportLinkProvider, name=report.name)
-                    if not provider:
-                        provider = component.queryAdapter(report, IReportLinkProvider, name="default")
-                
-                links.append(provider.link(report, context, self.remoteUser))
+        for report in component.subscribers((context,), IReport):
+            if not evaluate_predicate(report, context, self.remoteUser):
+                continue
+            if not evaluate_permission(report, context, self.remoteUser):
+                continue
+            # default and report name base providers
+            for name in (report.name, ''):
+                for objects in ((report, self.request), (report,)):
+                    self._set_link(report, context, links, objects, name)

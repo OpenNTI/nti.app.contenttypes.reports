@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+
 class IReportLinkProvider(interface.Interface):
     """
     Provides the necessary link decoration logic

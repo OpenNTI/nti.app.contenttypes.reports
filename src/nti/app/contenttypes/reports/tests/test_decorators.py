@@ -15,16 +15,12 @@ from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import greater_than
 does_not = is_not
- 
+
 import json
 
 from zope import component
-from zope import interface
 
 from nti.contenttypes.reports.interfaces import IReport
-
-from nti.contenttypes.reports.tests import ITestReportContext
-from nti.contenttypes.reports.tests import ITestSecondReportContext
 
 from nti.contenttypes.reports.reports import evaluate_permission
 
@@ -108,7 +104,7 @@ class TestReportDecoration(ReportsLayerTest):
         context_url = str('/dataserver2/Objects/' + third_ntiid)
         _response = self.testapp.get(context_url,
                                      extra_environ=environ)
-        
+
         res_dict = json.loads(_response.body)
 
         assert_that(res_dict,

@@ -27,16 +27,17 @@ from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
 from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
 
-from nti.contenttypes.reports.tests import ITestReportContext
-from nti.contenttypes.reports.tests import ITestSecondReportContext
-
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
 from nti.dataserver.contenttypes.note import Note
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
+from nti.contenttypes.reports.tests import ITestReportContext
+from nti.contenttypes.reports.tests import ITestSecondReportContext
+
 from nti.testing.base import AbstractTestBase
+
 
 @interface.implementer(ITestReportContext)
 class TestReportContext(Note):
@@ -51,12 +52,13 @@ class SecondReportContext(Note):
     Concrete test class for ITestSecondReportContext
     """
 
+
 @interface.implementer(IReportAvailablePredicate)
 class TestPredicate():
     """
     Test predicate
     """
-    
+
     def __init__(self, *args, **kwargs):
         pass
 
@@ -130,15 +132,19 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
                                            [u"csv", u"pdf"]))
-        
+
         self.predicate = functools.partial(TestPredicate)
-        
-        getGlobalSiteManager().registerSubscriptionAdapter(self.predicate, (TestReportContext,), IReportAvailablePredicate)
-        
+
+        gsm = getGlobalSiteManager()
+        gsm.registerSubscriptionAdapter(self.predicate,
+                                        (TestReportContext,), 
+                                        IReportAvailablePredicate)
+
         self.link_provider = functools.partial(DefaultReportLinkProvider)
-        
-        getGlobalSiteManager().registerSubscriptionAdapter(self.link_provider, (BaseReport,), IReportLinkProvider)
-        
+
+        gsm().registerSubscriptionAdapter(self.link_provider, 
+                                          (BaseReport,), 
+                                          IReportLinkProvider)
 
     @classmethod
     def tearDown(self):
@@ -159,12 +165,11 @@ class ReportsLayerTest(ApplicationLayerTest):
         sm.unregisterSubscriptionAdapter(factory=self.factory,
                                          required=(ITestSecondReportContext,),
                                          provided=IReport)
-        
+
         sm.unregisterSubscriptionAdapter(factory=self.predicate,
                                          required=(TestReportContext,),
                                          provided=IReportAvailablePredicate)
-        
+
         sm.unregisterSubscriptionAdapter(factory=self.link_provider,
                                          required=(BaseReport,),
                                          provided=IReportLinkProvider)
-        
