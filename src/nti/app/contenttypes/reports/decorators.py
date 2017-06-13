@@ -15,6 +15,8 @@ from nti.app.contenttypes.reports import MessageFactory as _
 
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 
+from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
+
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
 from nti.contenttypes.reports.interfaces import IReport
@@ -50,9 +52,10 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
             if      evaluate_predicate(report, context, self.remoteUser) \
                 and evaluate_permission(report, context, self.remoteUser):
                 
-                for provider in component.subscribers((report,), IReportLinkProvider):
-                    links.append(provider.link(report, context))
+                provider = component.queryMultiAdapter((report,self.request), IReportLinkProvider, name=report.name)
+                if not provider:
+                    provider = component.queryAdapter(report, IReportLinkProvider, name=report.name)
+                    if not provider:
+                        provider = component.queryAdapter(report, IReportLinkProvider, name="default")
                 
-                for provider in component.subscribers((report, self.request), IReportLinkProvider):
-                    links.append(provider.link(report, context, self.remoteUser))
-                
+                links.append(provider.link(report, context, self.remoteUser))
