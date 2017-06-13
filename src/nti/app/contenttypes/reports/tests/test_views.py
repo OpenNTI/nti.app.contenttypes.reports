@@ -33,7 +33,7 @@ class TestReportViews(ReportsLayerTest):
 
         # Turn the response body into a dictionary
         res_dict = json.loads(_response.body)
-        
+
         # Be sure values exist correctly
         assert_that(res_dict,
                     has_entry("Items", has_items(
