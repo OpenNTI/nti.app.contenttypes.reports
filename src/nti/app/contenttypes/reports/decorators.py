@@ -59,3 +59,4 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
             for name in (report.name, ''):
                 for objects in ((report, self.request), (report,)):
                     self._set_link(report, context, links, objects, name)
+
