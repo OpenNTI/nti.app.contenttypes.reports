@@ -40,12 +40,13 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _predicate(self, context, result):
         return self._is_authenticated
 
-    def _set_link(self, report, context, links, objects, name=''):
+    def _get_link(self, report, context, objects, name=''):
         provider = component.queryMultiAdapter(objects,
                                                IReportLinkProvider,
                                                name=name)
         if provider is not None:
-            links.append(provider.link(report, context, self.remoteUser))
+            return provider.link(report, context, self.remoteUser)
+        return None
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault(LINKS, [])
@@ -58,5 +59,6 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
             # default and report name base providers
             for name in (report.name, ''):
                 for objects in ((report, self.request), (report,)):
-                    self._set_link(report, context, links, objects, name)
-
+                    link = self._get_link(report, context, objects, name)
+                    if link is not None:
+                        links.append(link)
