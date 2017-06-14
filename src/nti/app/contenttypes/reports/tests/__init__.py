@@ -140,12 +140,6 @@ class ReportsLayerTest(ApplicationLayerTest):
                                         (TestReportContext,), 
                                         IReportAvailablePredicate)
 
-        self.link_provider = functools.partial(DefaultReportLinkProvider)
-
-        gsm.registerSubscriptionAdapter(self.link_provider, 
-                                        (BaseReport,), 
-                                        IReportLinkProvider)
-
     @classmethod
     def tearDown(self):
         """
