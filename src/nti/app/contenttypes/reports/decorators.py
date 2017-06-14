@@ -47,8 +47,9 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _get_link(self, report, context, request, name=''):
         provider = self._query_provider((report, request),
-                                        name=report.name) or self._query_provider((report,),
-                                                                                  name='')
+                                        name=report.name)
+        provider = provider or self._query_provider((report,),
+                                                     name='')
 
         if provider is not None:
             return provider.link(report, context, self.remoteUser)
