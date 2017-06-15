@@ -13,6 +13,8 @@ from zope import interface
 
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 
+from nti.app.contenttypes.reports import MessageFactory as _
+
 from nti.links.links import Link
 
 from nti.schema.schema import SchemaConfigured
@@ -37,4 +39,5 @@ class DefaultReportLinkProvider(SchemaConfigured):
         """
         return Link(context,
                     rel="report-%s" % report.name,
-                    elements=("@@" + report.name,))
+                    elements=("@@" + report.name,),
+                    title=_(report.title))
