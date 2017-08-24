@@ -20,12 +20,14 @@ from zope.component import getGlobalSiteManager
 
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 
-from nti.contenttypes.reports.reports import BaseReport
+from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
+
+from nti.contenttypes.reports._compat import text_
 
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
-from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
+from nti.contenttypes.reports.reports import BaseReport
 
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
@@ -54,7 +56,7 @@ class SecondReportContext(Note):
 
 
 @interface.implementer(IReportAvailablePredicate)
-class TestPredicate():
+class TestPredicate(object):
     """
     Test predicate
     """
@@ -62,7 +64,7 @@ class TestPredicate():
     def __init__(self, *args, **kwargs):
         pass
 
-    def evaluate(self, report, context, user):
+    def evaluate(self, unused_report, context, unused_user):
         return context.containerId == u"tag:nti:foo"
 
 
@@ -87,14 +89,14 @@ class ReportsLayerTest(ApplicationLayerTest):
             """
             Manual and temporary registration of reports
             """
-
+            supported_types = [text_(x) for x in supported_types]
             # Build a report factory
             report = functools.partial(BaseReport,
-                                       name=name,
-                                       title=title,
-                                       description=description,
+                                       name=text_(name),
+                                       title=text_(title),
+                                       description=text_(description),
                                        contexts=contexts,
-                                       permission=permission,
+                                       permission=text_(permission),
                                        supported_types=supported_types)
             self.factory = report
 
@@ -111,27 +113,27 @@ class ReportsLayerTest(ApplicationLayerTest):
             return report_obj
 
         # Register three reports to test with
-        self.utils.append(_register_report(u"TestReport",
-                                           u"Test Report",
-                                           u"TestDescription",
+        self.utils.append(_register_report("TestReport",
+                                           "Test Report",
+                                           "TestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"]))
+                                           ["csv", "pdf"]))
 
-        self.utils.append(_register_report(u"AnotherTestReport",
-                                           u"Another Test Report",
-                                           u"AnotherTestDescription",
+        self.utils.append(_register_report("AnotherTestReport",
+                                           "Another Test Report",
+                                           "AnotherTestDescription",
                                            (ITestReportContext,
                                             ITestSecondReportContext),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"]))
+                                           ["csv", "pdf"]))
 
-        self.utils.append(_register_report(u"ThirdTestReport",
-                                           u"Third Test Report",
-                                           u"ThirdTestDescription",
+        self.utils.append(_register_report("ThirdTestReport",
+                                           "Third Test Report",
+                                           "ThirdTestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           [u"csv", u"pdf"]))
+                                           ["csv", "pdf"]))
 
         self.predicate = functools.partial(TestPredicate)
 
