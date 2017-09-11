@@ -34,5 +34,4 @@ class DefaultReportPermission(object):
             return True
         else:
             return has_permission(report.permission, context, user)
-
 BaseReportPermission = DefaultReportPermission  # BWC

@@ -33,7 +33,7 @@ class DefaultReportLinkProvider(SchemaConfigured):
     def __init__(self, *args, **kwargs):
         pass
 
-    def link(self, report, context, user=None):
+    def link(self, report, context, unused_user=None):
         """
         Return default link elements
         """

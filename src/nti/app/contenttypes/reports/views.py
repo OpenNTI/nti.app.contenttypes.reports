@@ -9,7 +9,7 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from zope.container.contained import Contained
+from zope.location.interfaces import IContained
 
 from zope.traversing.interfaces import IPathAdapter
 
@@ -35,10 +35,11 @@ TOTAL = StandardExternalFields.TOTAL
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 
-@interface.implementer(IPathAdapter)
+@interface.implementer(IPathAdapter, IContained)
 @component.adapter(IDataserverFolder, IRequest)
-class ReportPathAdapter(Contained):
+class ReportPathAdapter(object):
 
+    __parent__ = None
     __name__ = "reporting"
 
     def __init__(self, context, request):
@@ -61,12 +62,9 @@ class RegisteredReportsView(AbstractAuthenticatedView):
     def __call__(self):
         # Create result dictionary
         result = LocatedExternalDict()
-        result[ITEM_COUNT] = 0
         result[ITEMS] = items = []
-        # Get all IReport objects
-        reports = list(component.getAllUtilitiesRegisteredFor(IReport))
         # Put all reports into the result
-        for report in reports:
+        for report in component.getAllUtilitiesRegisteredFor(IReport):
             items.append(to_external_object(report))
         result[ITEM_COUNT] = result[TOTAL] = len(items)
         return result
