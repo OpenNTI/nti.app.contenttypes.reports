@@ -36,7 +36,7 @@ class TestReportViews(ReportsLayerTest):
 
         # Be sure values exist correctly
         assert_that(res_dict,
-                    has_entry("Items", has_items(
-                        has_entry("name", "TestReport"),
-                        has_entry("name", "AnotherTestReport"),
-                        has_entry("name", "ThirdTestReport"))))
+                    has_entry("Items",
+                              has_items(has_entry("name", "TestReport"),
+                                        has_entry("name", "AnotherTestReport"),
+                                        has_entry("name", "ThirdTestReport"))))
