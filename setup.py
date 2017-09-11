@@ -49,7 +49,6 @@ setup(
         'setuptools',
         'nti.contenttypes.reports',
     ],
-    entry_points=entry_points,
     extras_require={
         'test': TESTS_REQUIRE,
     },
