@@ -16,7 +16,7 @@ from hamcrest import assert_that
 from hamcrest import greater_than
 does_not = is_not
 
-import json
+import simplejson as json
 
 from zope import component
 
@@ -26,15 +26,15 @@ from nti.contenttypes.reports.reports import evaluate_permission
 
 from nti.dataserver.users.users import User
 
-from nti.dataserver.tests import mock_dataserver
-
-from nti.externalization.oids import to_external_ntiid_oid
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
 from nti.app.contenttypes.reports.tests import TestReportContext
 from nti.app.contenttypes.reports.tests import SecondReportContext
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
+
+from nti.dataserver.tests import mock_dataserver
 
 
 class TestReportDecoration(ReportsLayerTest):
@@ -80,7 +80,6 @@ class TestReportDecoration(ReportsLayerTest):
         environ = self._make_extra_environ(self.basic_user)
         _response = self.testapp.get(context_url,
                                      extra_environ=environ)
-
         res_dict = json.loads(_response.body)
 
         assert_that(res_dict,
@@ -94,7 +93,6 @@ class TestReportDecoration(ReportsLayerTest):
         context_url = str('/dataserver2/Objects/' + second_ntiid)
         _response = self.testapp.get(context_url,
                                      extra_environ=environ)
-
         res_dict = json.loads(_response.body)
 
         assert_that(res_dict,
@@ -104,7 +102,6 @@ class TestReportDecoration(ReportsLayerTest):
         context_url = str('/dataserver2/Objects/' + third_ntiid)
         _response = self.testapp.get(context_url,
                                      extra_environ=environ)
-
         res_dict = json.loads(_response.body)
 
         assert_that(res_dict,
