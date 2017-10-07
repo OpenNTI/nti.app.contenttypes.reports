@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
 import functools
-
-import zope
-
-import zope.testing
 
 from zope import component
 from zope import interface
@@ -19,8 +16,6 @@ from zope import interface
 from zope.component import getGlobalSiteManager
 
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
-
-from nti.app.contenttypes.reports.reports import DefaultReportLinkProvider
 
 from nti.contenttypes.reports._compat import text_
 
