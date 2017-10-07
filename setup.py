@@ -48,9 +48,23 @@ setup(
     install_requires=[
         'setuptools',
         'nti.contenttypes.reports',
+        'nti.externalization',
+        'nti.links',
+        'nti.schema',
+        'pyramid',
+        'zope.i18nmessageid',
+        'zope.location',
+        'zope.component',
+        'zope.interface',
+        'zope.traversing',
     ],
     extras_require={
         'test': TESTS_REQUIRE,
+        'docs': [
+            'Sphinx',
+            'repoze.sphinx.autointerface',
+            'sphinx_rtd_theme',
+        ],
     },
     entry_points=entry_points
 )
