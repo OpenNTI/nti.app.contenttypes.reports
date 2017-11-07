@@ -36,6 +36,5 @@ class DefaultReportPermission(object):
     def evaluate(self, report, context, user):
         if not report.permission:
             return True
-        else:
-            return has_permission(report.permission, context, user)
+        return has_permission(report.permission, context, user)
 BaseReportPermission = DefaultReportPermission  # BWC
