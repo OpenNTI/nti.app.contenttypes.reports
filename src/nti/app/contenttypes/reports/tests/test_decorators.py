@@ -21,21 +21,21 @@ import simplejson as json
 
 from zope import component
 
-from nti.contenttypes.reports.interfaces import IReport
-
-from nti.contenttypes.reports.reports import evaluate_permission
-
-from nti.dataserver.users.users import User
-
-from nti.ntiids.oids import to_external_ntiid_oid
-
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
 from nti.app.contenttypes.reports.tests import TestReportContext
 from nti.app.contenttypes.reports.tests import SecondReportContext
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
 
+from nti.contenttypes.reports.interfaces import IReport
+
+from nti.contenttypes.reports.reports import evaluate_permission
+
 from nti.dataserver.tests import mock_dataserver
+
+from nti.dataserver.users.users import User
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 
 class TestReportDecoration(ReportsLayerTest):

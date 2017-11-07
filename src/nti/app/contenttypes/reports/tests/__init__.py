@@ -17,6 +17,8 @@ from zope.component import getGlobalSiteManager
 
 from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 
+from nti.app.testing.application_webtest import ApplicationLayerTest
+
 from nti.contenttypes.reports._compat import text_
 
 from nti.contenttypes.reports.interfaces import IReport
@@ -27,8 +29,6 @@ from nti.contenttypes.reports.reports import BaseReport
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
 from nti.dataserver.contenttypes.note import Note
-
-from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.contenttypes.reports.tests import ITestReportContext
 from nti.contenttypes.reports.tests import ITestSecondReportContext
