@@ -59,6 +59,7 @@ setup(
         'zope.location',
         'zope.component',
         'zope.interface',
+        'zope.security',
         'zope.traversing',
     ],
     extras_require={
