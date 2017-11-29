@@ -8,9 +8,9 @@
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
 	<include package="zope.security" />
-	
+
 	<include package="nti.contenttypes.reports" />
-	
+
 	<!-- Decorators -->
     <subscriber factory=".decorators._ReportContextDecorator"
                 for="nti.contenttypes.reports.interfaces.IReportContext
@@ -19,7 +19,8 @@
 
 	<!-- Traversing -->
 	<adapter name="reporting"
-			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
+			 for="nti.dataserver.interfaces.IDataserverFolder
+			      pyramid.interfaces.IRequest"
 			 factory=".views.ReportPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
@@ -28,5 +29,10 @@
 			 	provides="nti.contenttypes.reports.interfaces.IReportPredicate"
 			 	for="nti.contenttypes.reports.interfaces.IReport
 			 	  	 nti.dataserver.interfaces.IUser" />
+
+    <!-- Mark users as implementing IReportContext -->
+    <class class="nti.dataserver.users.User">
+        <implements interface="nti.contenttypes.reports.interfaces.IReportContext" />
+    </class>
 
 </configure>
