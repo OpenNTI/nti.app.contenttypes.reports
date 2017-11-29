@@ -9,6 +9,7 @@ from __future__ import absolute_import
 # pylint: disable=W0212,R0904
 
 from hamcrest import is_not
+from hamcrest import not_none
 from hamcrest import equal_to
 from hamcrest import has_item
 from hamcrest import has_entry
@@ -90,6 +91,11 @@ class TestReportDecoration(ReportsLayerTest):
                     has_entry("Links",
                               (has_item(
                                   has_entry("rel", "report-AnotherTestReport")))))
+        reports_exts = res_dict['Reports']
+        assert_that(reports_exts, has_length(3))
+        for report_ext in reports_exts:
+            assert_that(report_ext['href'], not_none())
+            assert_that(report_ext['rel'], not_none())
 
         context_url = str('/dataserver2/Objects/' + second_ntiid)
         _response = self.testapp.get(context_url,
@@ -99,6 +105,8 @@ class TestReportDecoration(ReportsLayerTest):
         assert_that(res_dict,
                     has_entry("Links",
                               does_not(has_item(has_entry("rel", "report-TestReport")))))
+        reports_exts = res_dict['Reports']
+        assert_that(reports_exts, has_length(0))
 
         context_url = str('/dataserver2/Objects/' + third_ntiid)
         _response = self.testapp.get(context_url,
@@ -108,6 +116,11 @@ class TestReportDecoration(ReportsLayerTest):
         assert_that(res_dict,
                     has_entry("Links",
                               (has_item(has_entry("rel", "report-AnotherTestReport")))))
+        reports_exts = res_dict['Reports']
+        assert_that(reports_exts, has_length(1))
+        for report_ext in reports_exts:
+            assert_that(report_ext['href'], not_none())
+            assert_that(report_ext['rel'], not_none())
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_user_permissions(self):

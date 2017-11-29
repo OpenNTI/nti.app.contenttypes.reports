@@ -38,7 +38,8 @@ class DefaultReportLinkProvider(SchemaConfigured):
         """
         Return default link elements
         """
+        rel = report.rel if report.rel else "report-%s" % report.name
         return Link(context,
-                    rel="report-%s" % report.name,
+                    rel=rel,
                     elements=("@@" + report.name,),
                     title=_(report.title))
