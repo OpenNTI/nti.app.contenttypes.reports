@@ -43,4 +43,8 @@
         <implements interface="nti.contenttypes.reports.interfaces.IReportContext" />
     </class>
 
+    <!-- Workspaces -->
+    <subscriber factory=".workspaces.GlobalReportCollection"
+                provides="nti.appserver.workspaces.interfaces.IGlobalCollection"
+                for="nti.appserver.workspaces.interfaces.IWorkspace" />
 </configure>

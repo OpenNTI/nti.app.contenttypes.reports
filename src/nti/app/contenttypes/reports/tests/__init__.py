@@ -22,6 +22,7 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 from nti.contenttypes.reports._compat import text_
 
 from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportContext
 from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
 from nti.contenttypes.reports.reports import BaseReport
@@ -29,6 +30,8 @@ from nti.contenttypes.reports.reports import BaseReport
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 
 from nti.dataserver.contenttypes.note import Note
+
+from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.contenttypes.reports.tests import ITestReportContext
 from nti.contenttypes.reports.tests import ITestSecondReportContext
@@ -130,11 +133,20 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            ACT_NTI_ADMIN.id,
                                            ["csv", "pdf"]))
 
+        # XXX: This should be somewhere else probably
+        IDataserverFolder.__bases__ = IDataserverFolder.__bases__ + (IReportContext, )
+        self.utils.append(_register_report("GlobalReport",
+                                           "Global Report",
+                                           "GlobalDescription",
+                                           (IDataserverFolder,),
+                                           ACT_NTI_ADMIN.id,
+                                           ["csv", "pdf"]))
+
         self.predicate = functools.partial(TestPredicate)
 
         gsm = getGlobalSiteManager()
         gsm.registerSubscriptionAdapter(self.predicate,
-                                        (TestReportContext,), 
+                                        (TestReportContext,),
                                         IReportAvailablePredicate)
 
     @classmethod
@@ -155,6 +167,10 @@ class ReportsLayerTest(ApplicationLayerTest):
 
         sm.unregisterSubscriptionAdapter(factory=self.factory,
                                          required=(ITestSecondReportContext,),
+                                         provided=IReport)
+
+        sm.unregisterSubscriptionAdapter(factory=self.factory,
+                                         required=(IDataserverFolder,),
                                          provided=IReport)
 
         sm.unregisterSubscriptionAdapter(factory=self.predicate,

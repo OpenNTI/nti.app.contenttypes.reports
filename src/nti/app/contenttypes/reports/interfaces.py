@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-.. $Id: 
+.. $Id:
 """
 
 from __future__ import division
@@ -9,6 +9,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 from zope import interface
+
+from nti.appserver.workspaces.interfaces import IContainerCollection
 
 
 class IReportLinkProvider(interface.Interface):
@@ -21,3 +23,9 @@ class IReportLinkProvider(interface.Interface):
         """
         Return the link to this report
         """
+
+
+class IGlobalReportCollection(IContainerCollection):
+    """
+    A report collection contained within the global workspace.
+    """
