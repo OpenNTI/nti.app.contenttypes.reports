@@ -11,6 +11,8 @@ from __future__ import absolute_import
 from zope import component
 from zope import interface
 
+from zope.security.interfaces import IPermission
+
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportPredicate
 
@@ -25,9 +27,8 @@ logger = __import__('logging').getLogger(__name__)
 @interface.implementer(IReportPredicate)
 class DefaultReportPermission(object):
     """
-    Concrete class that evaluates
-    user permissions on a context
-    for a base report
+    Concrete class that evaluates user permissions on a context for a base
+    report.
     """
 
     def __init__(self, *args, **kwargs):
@@ -36,5 +37,9 @@ class DefaultReportPermission(object):
     def evaluate(self, report, context, user):
         if not report.permission:
             return True
-        return has_permission(report.permission, context, user)
+        # XXX: Hack to lookup permission. We should define a IPermission choice
+        # on the interface, pointing to the permission vocab.
+        permission = component.queryUtility(IPermission, name=report.permission)
+        permission = permission or report.permission
+        return has_permission(permission, context, user)
 BaseReportPermission = DefaultReportPermission  # BWC
