@@ -37,8 +37,6 @@ class DefaultReportPermission(object):
     def evaluate(self, report, context, user):
         if not report.permission:
             return True
-        # XXX: Hack to lookup permission. We should define a IPermission choice
-        # on the interface, pointing to the permission vocab.
         permission = component.queryUtility(IPermission, name=report.permission)
         permission = permission or report.permission
         return has_permission(permission, context, user)
