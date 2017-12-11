@@ -31,6 +31,7 @@ class DefaultReportLinkProvider(SchemaConfigured):
     """
     createDirectFieldProperties(IReportLinkProvider)
 
+    # pylint: disable=super-init-not-called
     def __init__(self, *args, **kwargs):
         pass
 

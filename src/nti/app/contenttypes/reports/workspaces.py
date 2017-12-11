@@ -68,6 +68,7 @@ class GlobalReportCollection(Contained):
         provider = self._query_provider((report, request), name=report.name)
         provider = provider or self._query_provider((report,))
         if provider is not None:
+            # pylint: disable=no-member
             return provider.link(report, context, self.remoteUser)
         return None
 
@@ -84,6 +85,7 @@ class GlobalReportCollection(Contained):
         for report in ds_reports:
             report_ext = to_external_object(report)
             result.append(report_ext)
+            # pylint: disable=no-member
             link = self._get_link(report, context, self.request)
             if link is not None:
                 link_ext = render_link(link)

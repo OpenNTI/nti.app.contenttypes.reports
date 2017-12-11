@@ -56,7 +56,7 @@ class _ReportContextDecorator(AbstractAuthenticatedRequestAwareDecorator):
             return provider.link(report, context, self.remoteUser)
         return None
 
-    def _do_decorate_external(self, context, result_map):
+    def _do_decorate_external(self, context, result_map):  # pylint: disable=arguments-differ
         links = result_map.setdefault(LINKS, [])
         reports = result_map.setdefault('Reports', [])
         # Get all IReport objects subscribed to this report context

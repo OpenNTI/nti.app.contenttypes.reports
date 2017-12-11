@@ -5,8 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=protected-access,too-many-public-methods,arguments-differ
 
 import functools
 
@@ -101,10 +100,10 @@ class ReportsLayerTest(ApplicationLayerTest):
             # Register as a utility
             getGlobalSiteManager().registerUtility(report_obj, IReport, name)
 
-            for interface in contexts:
+            for provided in contexts:
                 # Register it as a subscriber
                 getGlobalSiteManager().registerSubscriptionAdapter(report,
-                                                                   (interface,),
+                                                                   (provided,),
                                                                    IReport)
 
             return report_obj
@@ -132,7 +131,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            ACT_NTI_ADMIN.id,
                                            ["csv", "pdf"]))
 
-        # XXX: This should be somewhere else probably
+        # This should be somewhere else probably
         IDataserverFolder.__bases__ = IDataserverFolder.__bases__ + (IReportContext, )
         self.utils.append(_register_report("GlobalReport",
                                            "Global Report",
