@@ -93,10 +93,9 @@ class ReportsLayerTest(ApplicationLayerTest):
                                        title=text_(title),
                                        description=text_(description),
                                        contexts=contexts,
-                                       permission=text_(permission),
+                                       permission=permission,
                                        supported_types=supported_types)
             self.factory = report
-
             report_obj = report()
             # Register as a utility
             getGlobalSiteManager().registerUtility(report_obj, IReport, name)
