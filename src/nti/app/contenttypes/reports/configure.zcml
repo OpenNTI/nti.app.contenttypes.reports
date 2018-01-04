@@ -30,19 +30,6 @@
 			 	for="nti.contenttypes.reports.interfaces.IReport
 			 	  	 nti.dataserver.interfaces.IUser" />
 
-    <!-- Mark objects as implementing IReportContext -->
-    <class class="nti.dataserver.users.User">
-        <implements interface="nti.contenttypes.reports.interfaces.IReportContext" />
-    </class>
-
-    <class class="nti.dataserver.contenttypes.forums.forum.CommunityForum">
-        <implements interface="nti.contenttypes.reports.interfaces.IReportContext" />
-    </class>
-
-    <class class="nti.dataserver.contenttypes.forums.topic.CommunityHeadlineTopic">
-        <implements interface="nti.contenttypes.reports.interfaces.IReportContext" />
-    </class>
-
     <!-- Workspaces -->
     <subscriber factory=".workspaces.GlobalReportCollection"
                 provides="nti.appserver.workspaces.interfaces.IGlobalCollection"
