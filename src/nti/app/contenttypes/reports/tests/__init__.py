@@ -18,7 +18,7 @@ from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
-from nti.contenttypes.reports._compat import text_
+from nti.base._compat import text_
 
 from nti.contenttypes.reports.interfaces import IReport
 from nti.contenttypes.reports.interfaces import IReportContext
