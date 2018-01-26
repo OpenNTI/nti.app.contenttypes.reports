@@ -17,8 +17,6 @@ from zope.location.interfaces import IContained
 
 from zope.traversing.interfaces import IPathAdapter
 
-from pyramid import httpexceptions as hexc
-
 from pyramid.view import view_config
 
 from pyramid.interfaces import IRequest
@@ -30,8 +28,6 @@ from nti.app.contenttypes.reports.interfaces import IReportLinkProvider
 from nti.app.contenttypes.reports.utils import get_visible_reports_for_context
 
 from nti.contenttypes.reports.interfaces import IReport
-
-from nti.dataserver.authorization import is_admin_or_site_admin
 
 from nti.dataserver.interfaces import IDataserverFolder
 
@@ -72,14 +68,7 @@ class RegisteredReportsView(AbstractAuthenticatedView):
     View to fetch all current IReport objects
     """
 
-    def _predicate(self):
-        # XXX: Should we gatekeep this at all? We do not for global reports
-        # below.
-        if not is_admin_or_site_admin(self.remoteUser):
-            raise hexc.HTTPForbidden()
-
     def __call__(self):
-        self._predicate()
         result = LocatedExternalDict()
         result[ITEMS] = items = []
         for report in component.getAllUtilitiesRegisteredFor(IReport):
