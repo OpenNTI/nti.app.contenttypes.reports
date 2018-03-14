@@ -114,7 +114,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            "TestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           ["csv", "pdf"]))
+                                           ["text/csv", "application/pdf"]))
 
         self.utils.append(_register_report("AnotherTestReport",
                                            "Another Test Report",
@@ -122,14 +122,14 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            (ITestReportContext,
                                             ITestSecondReportContext),
                                            ACT_NTI_ADMIN.id,
-                                           ["csv", "pdf"]))
+                                           ["text/csv", "application/pdf"]))
 
         self.utils.append(_register_report("ThirdTestReport",
                                            "Third Test Report",
                                            "ThirdTestDescription",
                                            (ITestReportContext,),
                                            ACT_NTI_ADMIN.id,
-                                           ["csv", "pdf"]))
+                                           ["text/csv", "application/pdf"]))
 
         # This should be somewhere else probably
         IDataserverFolder.__bases__ = IDataserverFolder.__bases__ + (IReportContext, )
@@ -138,7 +138,7 @@ class ReportsLayerTest(ApplicationLayerTest):
                                            "GlobalDescription",
                                            (IDataserverFolder,),
                                            ACT_NTI_ADMIN.id,
-                                           ["csv", "pdf"]))
+                                           ["text/csv", "application/pdf"]))
 
         self.predicate = functools.partial(TestPredicate)
 
