@@ -11,6 +11,7 @@ from __future__ import absolute_import
 from zope import component
 
 from nti.contenttypes.reports.interfaces import IReport
+from nti.contenttypes.reports.interfaces import IReportFilter
 
 from nti.contenttypes.reports.reports import evaluate_permission
 from nti.contenttypes.reports.reports import evaluate_predicate
@@ -27,7 +28,12 @@ def get_visible_reports_for_context(context, user):
     Return the :class:`IReport` objects for the give context and user.
     """
     result = []
+    report_filter = component.queryAdapter(context, IReportFilter, default=None)
     for report in component.subscribers((context,), IReport):
+        if      report_filter is not None \
+            and report_filter.should_exclude_report(report):
+            logger.debug("get_visible_reports_for_context: excluding report %s", report)
+            continue
         if      evaluate_predicate(report, context, user) \
             and evaluate_permission(report, context, user):
             result.append(report)
