@@ -32,7 +32,6 @@ def get_visible_reports_for_context(context, user):
     for report in component.subscribers((context,), IReport):
         if      report_filter is not None \
             and report_filter.should_exclude_report(report):
-            logger.debug("get_visible_reports_for_context: excluding report %s", report)
             continue
         if      evaluate_predicate(report, context, user) \
             and evaluate_permission(report, context, user):
