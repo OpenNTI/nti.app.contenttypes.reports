@@ -28,7 +28,7 @@ def get_visible_reports_for_context(context, user):
     Return the :class:`IReport` objects for the give context and user.
     """
     result = []
-    report_filter = component.queryAdapter(context, IReportFilter, default=None)
+    report_filter = IReportFilter(context, None)
     for report in component.subscribers((context,), IReport):
         if      report_filter is not None \
             and report_filter.should_exclude_report(report):
