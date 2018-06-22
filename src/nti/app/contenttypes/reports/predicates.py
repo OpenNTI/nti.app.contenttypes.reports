@@ -10,8 +10,6 @@ from __future__ import absolute_import
 
 from zope import interface
 
-from nti.contenttypes.credit.interfaces import ICreditTranscript
-
 from nti.contenttypes.reports.interfaces import IReportAvailablePredicate
 
 from nti.externalization.interfaces import StandardExternalFields
@@ -28,6 +26,10 @@ class UserTranscriptPredicate(object):
         pass
 
     def evaluate(self, report, context, unused_user):
-        # Must have a transcript to get the transcript report
-        return report.name != 'UserTranscriptReport' \
-            or ICreditTranscript(context, None) is not None
+        try:
+            from nti.contenttypes.credit.interfaces import ICreditTranscript
+            # Must have a transcript to get the transcript report
+            return report.name != 'UserTranscriptReport' \
+                or ICreditTranscript(context, None) is not None
+        except ImportError:
+            return False
