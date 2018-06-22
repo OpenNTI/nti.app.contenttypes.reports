@@ -30,7 +30,11 @@ from zope.cachedescriptors.property import Lazy
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ISiteAdminUtility
 
-from nti.app.contenttypes.credit.views import UserAwardedCreditFilterMixin
+try:
+    from nti.app.contenttypes.credit.views import UserAwardedCreditFilterMixin
+except ImportError:
+    class UserAwardedCreditFilterMixin(object):
+        pass
 
 from nti.app.contenttypes.reports import MessageFactory as _
 
