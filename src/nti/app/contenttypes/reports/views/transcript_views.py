@@ -38,8 +38,6 @@ from nti.app.contenttypes.reports import VIEW_USER_TRANSCRIPT
 
 from nti.app.contenttypes.reports.views.view_mixins import AbstractReportView
 
-from nti.contenttypes.credit.interfaces import ICreditTranscript
-
 from nti.dataserver.authorization import is_admin
 from nti.dataserver.authorization import is_site_admin
 
@@ -82,10 +80,14 @@ class AbstractUserTranscriptView(AbstractReportView,
 
     @Lazy
     def sorted_credits(self):
-        awarded_credits = ICreditTranscript(self.context)
-        awarded_credits = awarded_credits.iter_awarded_credits()
-        awarded_credits = self.filter_credits(awarded_credits)
-        return self.sort_credits(awarded_credits)
+        try:
+            from nti.contenttypes.credit.interfaces import ICreditTranscript
+            awarded_credits = ICreditTranscript(self.context)
+            awarded_credits = awarded_credits.iter_awarded_credits()
+            awarded_credits = self.filter_credits(awarded_credits)
+            return self.sort_credits(awarded_credits)
+        except ImportError:
+            return ()
 
     def _convert_list_to_str(self, list_input, connector='and'):
         result = ''
