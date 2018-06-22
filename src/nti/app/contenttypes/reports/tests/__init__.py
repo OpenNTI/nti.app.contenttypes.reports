@@ -72,7 +72,7 @@ class ReportsLayerTest(ApplicationLayerTest):
     set_up_packages = ('nti.app.contenttypes.reports',)
 
     utils = []
-    factory = None
+    subscriber_contexts = []
     predicate = None
     link_provider = None
 
@@ -95,8 +95,9 @@ class ReportsLayerTest(ApplicationLayerTest):
                                        contexts=contexts,
                                        permission=permission,
                                        supported_types=supported_types)
-            self.factory = report
             report_obj = report()
+            for context in contexts:
+                self.subscriber_contexts.append(context)
             # Register as a utility
             getGlobalSiteManager().registerUtility(report_obj, IReport, name)
 
@@ -150,8 +151,7 @@ class ReportsLayerTest(ApplicationLayerTest):
     @classmethod
     def tearDown(self):
         """
-        Unregister all test utilities and
-        subscribers
+        Unregister all test utilities and subscribers
         """
         sm = component.getGlobalSiteManager()
         for util in self.utils:
@@ -159,17 +159,9 @@ class ReportsLayerTest(ApplicationLayerTest):
                                  provided=IReport,
                                  name=util.name)
 
-        sm.unregisterSubscriptionAdapter(factory=self.factory,
-                                         required=(ITestReportContext,),
-                                         provided=IReport)
-
-        sm.unregisterSubscriptionAdapter(factory=self.factory,
-                                         required=(ITestSecondReportContext,),
-                                         provided=IReport)
-
-        sm.unregisterSubscriptionAdapter(factory=self.factory,
-                                         required=(IDataserverFolder,),
-                                         provided=IReport)
+        for context in self.subscriber_contexts:
+            sm.unregisterSubscriptionAdapter(required=(context,),
+                                             provided=IReport)
 
         sm.unregisterSubscriptionAdapter(factory=self.predicate,
                                          required=(TestReportContext,),
