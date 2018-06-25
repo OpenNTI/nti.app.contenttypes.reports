@@ -31,6 +31,8 @@ from nti.dataserver.users import User
 
 from nti.externalization.interfaces import StandardExternalFields
 
+from nti.mailer.interfaces import IEmailAddressable
+
 from nti.schema.eqhash import EqHash
 
 LINKS = StandardExternalFields.LINKS
@@ -84,7 +86,7 @@ class UserInfo(object):
     """
 
     def __init__(self, user=None, username=None, display=None, count=None, perc=None):
-
+        self._user = user
         if username and display:
             self.username = username
             self.display = display
@@ -104,3 +106,8 @@ class UserInfo(object):
         if self.last_name and self.first_name:
             return self.last_name + ', ' + self.first_name
         return self.last_name or self.username
+
+    @Lazy
+    def email(self):
+        email_addressable = IEmailAddressable(self._user, None)
+        return email_addressable.email if email_addressable else None
