@@ -161,7 +161,6 @@ class AbstractUserTranscriptView(AbstractReportView,
         self._check_access()
         return self._do_call()
 
-
 @view_config(context=IUser,
              request_method='GET',
              name=VIEW_USER_TRANSCRIPT,
