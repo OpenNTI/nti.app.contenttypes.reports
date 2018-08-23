@@ -39,5 +39,6 @@ class DefaultReportPermission(object):
             return True
         permission = component.queryUtility(IPermission, name=report.permission)
         permission = permission or report.permission
+        # The IReportContext must have an IACLProvider for this call
         return has_permission(permission, context, user)
 BaseReportPermission = DefaultReportPermission  # BWC

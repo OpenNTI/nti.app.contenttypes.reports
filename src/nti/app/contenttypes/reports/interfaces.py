@@ -18,7 +18,6 @@ from nti.appserver.workspaces.interfaces import IContainerCollection
 
 from nti.schema.field import TextLine
 
-
 class IPDFReportView(interface.Interface):
     """
     An interface that all the reporting views
