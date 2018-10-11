@@ -128,10 +128,11 @@ class AbstractReportView(AbstractAuthenticatedView,
         username = self._replace_username(username)
         return UserInfo(user, username=username, **kwargs)
 
-    def user_as_affix(self, user):
+    def user_as_affix(self, user, user_info=None):
         # replace all blank spaces with empty space
-        displayname = self.build_user_info(user).display
-        return displayname.replace(' ', '')
+        if user_info is None:
+            user_info = self.build_user_info(user)
+        return user_info.display.replace(' ', '')
 
     def filter_objects(self, objects):
         """
