@@ -20,8 +20,6 @@ from pyramid.view import view_defaults
 
 from z3c.pagelet.browser import BrowserPagelet
 
-from zc.displayname.interfaces import IDisplayNameGenerator
-
 from zope.cachedescriptors.property import Lazy
 
 from zope.intid.interfaces import IIntIds
@@ -130,14 +128,9 @@ class AbstractReportView(AbstractAuthenticatedView,
         username = self._replace_username(username)
         return UserInfo(user, username=username, **kwargs)
 
-    def get_user_display_name(self, user, request=None):
-        if request is None:
-            request = self.request
-        return component.getMultiAdapter((user, request), IDisplayNameGenerator)()
-
-    def user_as_affix(self, user, request=None):
+    def user_as_affix(self, user):
         # replace all blank spaces with empty space
-        displayname = self.get_user_display_name(user, request)
+        displayname = self.build_user_info(user).display
         return displayname.replace(' ', '')
 
     def filter_objects(self, objects):
