@@ -64,8 +64,9 @@ class AbstractReportView(AbstractAuthenticatedView,
         AbstractAuthenticatedView.__init__(self, request)
         BrowserPagelet.__init__(self, context, request)
 
-        if request.view_name:
-            self.filename = request.view_name
+    @property
+    def filename(self):
+        return self.request.view_name
 
     @Lazy
     def timezone_util(self):
@@ -126,6 +127,12 @@ class AbstractReportView(AbstractAuthenticatedView,
             username = user.username
         username = self._replace_username(username)
         return UserInfo(user, username=username, **kwargs)
+
+    def user_as_affix(self, user, user_info=None):
+        # replace all blank spaces with empty space
+        if user_info is None:
+            user_info = self.build_user_info(user)
+        return user_info.display.replace(' ', '')
 
     def filter_objects(self, objects):
         """

@@ -66,9 +66,6 @@ class AbstractUserTranscriptView(AbstractReportView,
 
         self.options = {}
 
-        if request.view_name:
-            self.filename = request.view_name
-
     def get_user_info(self):
         return self.build_user_info(self.context)
 
