@@ -16,7 +16,14 @@ from datetime import datetime
 from zope import component
 from zope import interface
 
+from pyramid.path import AssetResolver
+
 from pyramid.view import view_defaults
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase import ttfonts
+
+from reportlab.lib.utils import simpleSplit
 
 from z3c.pagelet.browser import BrowserPagelet
 
@@ -98,9 +105,12 @@ class AbstractReportView(AbstractAuthenticatedView,
         return date.strftime('%b %d, %Y %I:%M %p')
 
     @Lazy
+    def timezone_displayname(self):
+        return self.timezone_util.get_timezone_display_name()
+
+    @Lazy
     def timezone_info_str(self):
-        tz_display = self.timezone_util.get_timezone_display_name()
-        return '(Times in %s)' % tz_display
+        return '(Times in %s)' % self.timezone_displayname
 
     def generate_footer(self):
         title = self.report_title
@@ -144,3 +154,60 @@ class AbstractReportView(AbstractAuthenticatedView,
 
     def wrap_text(self, text, size):
         return textwrap.fill(text, size)
+
+
+def get_header_options(input_data,
+                       font_size=10,
+                       font_name='OpenSans',
+                       leading=20,
+                       total_width=4.0*72,
+                       col_widths=[0.22, 0.78],
+                       minimum_header_height=110,
+                       body_y1=0.5*72,
+                       total_height=595):
+    """
+    input_data should be an array of tuple.
+    """
+    header_height = 0
+    lines = {}
+    widths = [x*total_width for x in col_widths]
+
+    # left indent, like report_title
+    widths[0] -= 0.07*72
+
+    # TODO: dynamically compute the widths: from reportlab.pdfbase.pdfmetrics import stringWidth
+    for row in input_data:
+        _max = 0
+        for index in range(0, len(row)):
+            number_of_lines = len(simpleSplit(row[index], font_name, font_size, widths[index]))
+            if _max < number_of_lines:
+                _max = number_of_lines
+
+        header_height += _max*leading
+
+    # report_title:40
+    header_height = header_height + 40
+    if header_height > total_height:
+        raise ValueError("There is too much data for the header.")
+
+    # The LOGO image starts from 7in.
+    # If no minimum height, the body would overlap the LOGO image.
+    if header_height < minimum_header_height:
+        header_height = minimum_header_height
+
+    header_y1 = total_height - header_height
+    body_height = header_y1 - body_y1
+
+    return {'defaultHeaderHeight': header_height,
+            'defaultHeaderY1': header_y1,
+            'defaultBodyHeight': body_height,
+            'defaultColWiths': ','.join([str(x*total_width) for x in col_widths])}
+
+
+# register fonts.
+def register_fonts():
+    pdfmetrics.registerFont(ttfonts.TTFont('OpenSans', AssetResolver().resolve('nti.app.contenttypes.reports:fonts/OpenSans-Regular.ttf').abspath()))
+    pdfmetrics.registerFont(ttfonts.TTFont('OpenSansSemiBold', AssetResolver().resolve('nti.app.contenttypes.reports:fonts/OpenSans-Semibold.ttf').abspath()))
+    pdfmetrics.registerFont(ttfonts.TTFont('OpenSansBold', AssetResolver().resolve('nti.app.contenttypes.reports:fonts/OpenSans-Bold.ttf').abspath()))
+    pdfmetrics.registerFont(ttfonts.TTFont('OpenSansLight', AssetResolver().resolve('nti.app.contenttypes.reports:fonts/OpenSans-Light.ttf').abspath()))
+register_fonts()
