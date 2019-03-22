@@ -107,8 +107,8 @@
 		<paraStyle name="user" fontName="OpenSansLight" fontSize="12" textColor="#3fb3f6"/>
 
 		<!-- header_table_2 column -->
-		<paraStyle name="header_table_col_first" fontName="OpenSans" fontSize="10" leading="20" leftIndent=".07in"/>
-		<paraStyle name="header_table_col" fontName="OpenSans" fontSize="10" leading="20"/>
+		<paraStyle name="header_table_2_col_first" fontName="OpenSans" fontSize="10" leading="20" leftIndent=".07in"/>
+		<paraStyle name="header_table_2_col" fontName="OpenSans" fontSize="10" leading="20"/>
 
 		<blockTableStyle id="default">
 			<lineStyle 	start="0,0" stop="-1,-1"
@@ -201,15 +201,6 @@
 			<blockFont start="0,0" stop="-1,-1" name="OpenSans" size="10" />
 		</blockTableStyle>
 
-        <!-- Header table whose height is computed based on the data -->
-        <blockTableStyle id="header_table_2">
-            <blockTopPadding start="0,0" stop="-1,-1" length="0.0in"/>
-            <blockRightPadding start="0,0" stop="-1,-1" length="0.0in"/>
-            <blockBottomPadding start="0,0" stop="-1,-1" length="0.0in"/>
-            <blockLeftPadding start="0,0" stop="-1,-1" length="0.0in"/>
-            <blockValign value="top" start="0,0" stop="-1,-1"/>
-        </blockTableStyle>
-
 		<!-- For parent comment tables -->
 		<blockTableStyle id="parent_table">
 			<lineStyle 	start="0,0" stop="-1,-1"
@@ -233,6 +224,8 @@
 			<blockAlignment start="1,0" stop="-1,-1" value="right" />
 
 		</blockTableStyle>
+
+        <metal:slot metal:define-slot="header_table_2"/>
 
 	</stylesheet>
 
@@ -444,6 +437,29 @@
 			</slices>
 		</pieChart>
 	</illustration>
+
+
+    <metal:macro metal:define-macro="header_table_2_content" >
+        <tal:block tal:omit-tag="" tal:define="data view/__parent__/options/top_header_data|nothing">
+            <tal:block tal:condition="not:data">
+                <tr><td></td></tr>
+            </tal:block>
+
+            <tal:block tal:condition="data">
+                <tr tal:repeat="row data">
+                    <tal:block tal:repeat="col row">
+                        <tal:block tal:omit-tag="" tal:condition="python: col!='NTI_COLSPAN'">
+                            <td>
+                                <para tal:attributes="style python: 'header_table_2_col_first' if repeat['col'].start else 'header_table_2_col'" >
+                                     <span tal:content="python: col if isinstance(col, basestring) else col.text"/>
+                                </para>
+                            </td>
+                        </tal:block>
+                    </tal:block>
+                </tr>
+            </tal:block>
+        </tal:block>
+    </metal:macro>
 
 	</story>
 
