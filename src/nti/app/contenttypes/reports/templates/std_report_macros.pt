@@ -107,7 +107,7 @@
 		<paraStyle name="user" fontName="OpenSansLight" fontSize="12" textColor="#3fb3f6"/>
 
 		<!-- header_table_2 column -->
-		<paraStyle name="header_table_2_col_first" fontName="OpenSans" fontSize="10" leading="20" leftIndent=".07in"/>
+		<paraStyle name="header_table_2_col_first" fontName="OpenSans" fontSize="10" leading="20" leftIndent="2"/>
 		<paraStyle name="header_table_2_col" fontName="OpenSans" fontSize="10" leading="20"/>
 
 		<blockTableStyle id="default">

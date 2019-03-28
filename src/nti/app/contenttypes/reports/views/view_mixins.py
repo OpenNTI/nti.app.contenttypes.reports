@@ -32,6 +32,7 @@ from nti.app.contenttypes.reports.interfaces import IPDFReportView
 
 from nti.app.contenttypes.reports.utils import UserInfo
 
+from nti.app.contenttypes.reports.views.table_utils import TableCell
 from nti.app.contenttypes.reports.views.table_utils import get_top_header_options
 
 from nti.appserver.interfaces import IDisplayableTimeProvider
@@ -104,6 +105,10 @@ class AbstractReportView(AbstractAuthenticatedView,
         return self.timezone_util.get_timezone_display_name()
 
     @Lazy
+    def timezone_header_str(self):
+        return 'Times in %s' % self.timezone_displayname
+
+    @Lazy
     def timezone_info_str(self):
         return '(Times in %s)' % self.timezone_displayname
 
@@ -149,6 +154,9 @@ class AbstractReportView(AbstractAuthenticatedView,
 
     def wrap_text(self, text, size):
         return textwrap.fill(text, size)
+
+    def table_cell(self, text, **kwargs):
+        return TableCell(text, **kwargs)
 
     def get_top_header_options(self, data, **kwargs):
         return get_top_header_options(data, **kwargs)

@@ -40,7 +40,7 @@ def get_top_header_options(data,
     widths = [x*total_width for x in col_widths]
 
     # left indent, like report_title
-    widths[0] -= 0.07*72
+    widths[0] -= 2
 
     # TODO: dynamically compute the widths: from reportlab.pdfbase.pdfmetrics import stringWidth
     for row in data:
