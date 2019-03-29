@@ -103,29 +103,8 @@
 		</blockTableStyle>
 
         <metal:slot fill-slot="header_table_2">
-
             <!-- dynamically generate a table style for header table -->
-            <blockTableStyle id="header_table_2">
-                <blockTopPadding start="0,0" stop="-1,-1" length="0.0in"/>
-                <blockRightPadding start="0,0" stop="-1,-1" length="0.0in"/>
-                <blockBottomPadding start="0,0" stop="-1,-1" length="0.0in"/>
-                <blockLeftPadding start="0,0" stop="-1,-1" length="0.0in"/>
-                <blockValign value="top" start="0,0" stop="-1,-1"/>
-
-               <tal:block tal:omit-tag="" tal:condition="options/top_header_data|nothing">
-                    <tal:block tal:define="data options/top_header_data">
-                        <tal:block tal:repeat="row data">
-                            <tal:block tal:repeat="col row">
-                                <tal:block tal:condition="python: not isinstance(col, basestring) and col.colspan > 1">
-                                    <blockSpan tal:attributes="start python: '%s,%s' % (repeat['col'].index,repeat['row'].index);
-                                                               stop python: '%s,%s' % (repeat['col'].index+col.colspan-1,repeat['row'].index) "/>
-                                </tal:block>
-                            </tal:block>
-                        </tal:block>
-                    </tal:block>
-                </tal:block>
-            </blockTableStyle>
-
+            <blockTableStyle metal:use-macro="macro:header_table_2_style">
         </metal:slot>
 
 	</stylesheet>

@@ -196,6 +196,13 @@
 
     <z3c:macro
         template="templates/std_report_macros.pt"
+        name="header_table_2_style"
+        for="zope.interface.Interface"
+        view="zope.interface.Interface"
+        layer="pyramid.interfaces.IRequest" />
+
+    <z3c:macro
+        template="templates/std_report_macros.pt"
         name="header_table_2_content"
         for="zope.interface.Interface"
         view="zope.interface.Interface"
