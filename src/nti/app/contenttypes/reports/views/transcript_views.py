@@ -187,6 +187,14 @@ class UserTranscriptReportPdf(AbstractUserTranscriptView):
         options['awarded_credits'] = self._get_awarded_credits()
         options['aggregate_credit'] = self._get_aggregate_credit()
         options['filter_str'] = self._get_filter_str()
+
+        data = (('Name:', options['user'].display or ''),
+                ('Login:', options['user'].username or ''),
+                ('Date:', self.report_date_str),
+                (self.table_cell(self.timezone_header_str, colspan=2), 'NTI_COLSPAN'))
+        header_options = self.get_top_header_options(data=data,
+                                                     col_widths=[0.18, 0.82])
+        options.update(header_options)
         return options
 
 

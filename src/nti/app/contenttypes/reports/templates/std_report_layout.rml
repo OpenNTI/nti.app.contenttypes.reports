@@ -25,8 +25,11 @@
 			<frame id="main_header"
 				   x1="7in" y1="6.8in"
 				   width="4in" height="1.3in"
-				   showBoundary="0" />
-			<frame id="first" x1="0.5in" y1="0.5in" width="10in" height="6in"/>
+				   showBoundary="0"
+				   tal:attributes="height options/defaultHeaderHeight|string:1.3in;
+				                   y1 options/defaultHeaderY1|string:6.8in"/>
+			<frame id="first" x1="0.5in" y1="0.5in" width="10in" height="6in"
+			       tal:attributes="height options/defaultBodyHeight|string:6in"/>
 		</pageTemplate>
 
 		<pageTemplate id="main">
@@ -98,16 +101,28 @@
 					   colorName="black"/>
 			<blockRightPadding start="0,0" stop="-1,-1" length="3mm"/>
 		</blockTableStyle>
+
+        <metal:slot fill-slot="header_table_2">
+            <!-- dynamically generate a table style for header table -->
+            <blockTableStyle metal:use-macro="macro:header_table_2_style">
+        </metal:slot>
+
 	</stylesheet>
 
 	<story firstPageTemplate="cover">
 
 		<title 	style="report_title" alignment="left"
 				leftIndent=".07in"
-				tal:content="view/report_title" >Report Title</title>
+				tal:content="view/report_title"
+				tal:attributes="style python: 'report_title_2' if options.get('top_header_data') else 'report_title';
+				                leftIndent python: '0' if options.get('top_header_data') else '0.07in'" >Report Title</title>
+
 		<blockTable alignment='left' style="header_table"
-					tal:content="structure provider:header_manager">
-		</blockTable>
+                    tal:content="structure provider:header_manager"
+                    tal:attributes="colWidths options/defaultColWidths|nothing;
+                                    style python: 'header_table_2' if options.get('top_header_data') else 'header_table'">
+        </blockTable>
+
 		<nextFrame />
    		<metal:block tal:content="structure provider:pagelet">
 			RML Content

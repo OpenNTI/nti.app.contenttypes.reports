@@ -68,6 +68,11 @@
 					alignment='right' spaceAfter=".2in"
 					textColor="#494949" fontName="OpenSansLight"/>
 
+        <paraStyle  name="report_title_2"
+                    fontSize="20"
+                    alignment='right' spaceAfter=".3in"
+                    textColor="#494949" fontName="OpenSansLight"/>
+
 		<paraStyle name="h1" fontSize="30" textColor="#494949" fontName="OpenSansLight"/>
 
 		<paraStyle name="h2" fontSize="15" textColor="#494949" fontName="OpenSans"
@@ -100,6 +105,10 @@
 			   leading="15" />
 
 		<paraStyle name="user" fontName="OpenSansLight" fontSize="12" textColor="#3fb3f6"/>
+
+		<!-- header_table_2 column -->
+		<paraStyle name="header_table_2_col_first" fontName="OpenSans" fontSize="10" leading="20" leftIndent="2"/>
+		<paraStyle name="header_table_2_col" fontName="OpenSans" fontSize="10" leading="20"/>
 
 		<blockTableStyle id="default">
 			<lineStyle 	start="0,0" stop="-1,-1"
@@ -215,6 +224,8 @@
 			<blockAlignment start="1,0" stop="-1,-1" value="right" />
 
 		</blockTableStyle>
+
+        <metal:slot metal:define-slot="header_table_2"/>
 
 	</stylesheet>
 
@@ -426,6 +437,52 @@
 			</slices>
 		</pieChart>
 	</illustration>
+
+    <metal:macro metal:define-macro="header_table_2_style" >
+        <!-- dynamically generate a table style for header table -->
+        <blockTableStyle id="header_table_2" >
+            <blockTopPadding start="0,0" stop="-1,-1" length="0.0in"/>
+            <blockRightPadding start="0,0" stop="-1,-1" length="0.0in"/>
+            <blockBottomPadding start="0,0" stop="-1,-1" length="0.0in"/>
+            <blockLeftPadding start="0,0" stop="-1,-1" length="0.0in"/>
+            <blockValign value="top" start="0,0" stop="-1,-1"/>
+
+           <tal:block tal:omit-tag="" tal:condition="options/top_header_data|nothing">
+                <tal:block tal:define="data options/top_header_data">
+                    <tal:block tal:repeat="row data">
+                        <tal:block tal:repeat="col row">
+                            <tal:block tal:condition="python: not isinstance(col, basestring) and col.colspan > 1">
+                                <blockSpan tal:attributes="start python: '%s,%s' % (repeat['col'].index,repeat['row'].index);
+                                                           stop python: '%s,%s' % (repeat['col'].index+col.colspan-1,repeat['row'].index) "/>
+                            </tal:block>
+                        </tal:block>
+                    </tal:block>
+                </tal:block>
+            </tal:block>
+        </blockTableStyle>
+    </metal:macro>
+
+    <metal:macro metal:define-macro="header_table_2_content" >
+        <tal:block tal:omit-tag="" tal:define="data view/__parent__/options/top_header_data|nothing">
+            <tal:block tal:condition="not:data">
+                <tr><td></td></tr>
+            </tal:block>
+
+            <tal:block tal:condition="data">
+                <tr tal:repeat="row data">
+                    <tal:block tal:repeat="col row">
+                        <tal:block tal:omit-tag="" tal:condition="python: col!='NTI_COLSPAN'">
+                            <td>
+                                <para tal:attributes="style python: 'header_table_2_col_first' if repeat['col'].start else 'header_table_2_col'" >
+                                     <span tal:content="python: col if isinstance(col, basestring) else col.text"/>
+                                </para>
+                            </td>
+                        </tal:block>
+                    </tal:block>
+                </tr>
+            </tal:block>
+        </tal:block>
+    </metal:macro>
 
 	</story>
 
