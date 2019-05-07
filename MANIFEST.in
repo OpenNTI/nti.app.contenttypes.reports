@@ -16,3 +16,5 @@ recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include src *.zcml
 recursive-include src *.pot
+recursive-include src *.rml
+recursive-include src *.pt
