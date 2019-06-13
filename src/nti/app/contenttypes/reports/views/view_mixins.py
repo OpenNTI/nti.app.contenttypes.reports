@@ -44,6 +44,8 @@ from nti.dataserver.metadata.index import CATALOG_NAME
 
 from nti.dataserver.users.users import User
 
+from nti.namedfile.file import safe_filename
+
 from nti.zope_catalog.interfaces import IDeferredCatalog
 
 logger = __import__('logging').getLogger(__name__)
@@ -67,9 +69,13 @@ class AbstractReportView(AbstractAuthenticatedView,
         AbstractAuthenticatedView.__init__(self, request)
         BrowserPagelet.__init__(self, context, request)
 
+    def _build_filename(self, parts, extension=".pdf"):
+        basename = "_".join(filter(None, parts))
+        return safe_filename((basename or '') + (extension or ''))
+
     @property
     def filename(self):
-        return self.request.view_name
+        return self._build_filename([self.report_title or self.request.view_name])
 
     @Lazy
     def timezone_util(self):

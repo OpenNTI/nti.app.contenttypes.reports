@@ -174,6 +174,10 @@ class UserTranscriptReportPdf(AbstractUserTranscriptView):
 
     report_title = _(u'User Transcript Report')
 
+    @property
+    def filename(self):
+        return self._build_filename([self.context.username, self.report_title])
+
     def generate_footer(self):
         date = self._adjust_date(datetime.utcnow())
         date = date.strftime('%b %d, %Y %I:%M %p')
