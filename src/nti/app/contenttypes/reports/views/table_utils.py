@@ -15,6 +15,8 @@ from reportlab.pdfbase import ttfonts
 
 from reportlab.lib.utils import simpleSplit
 
+logger = __import__('logging').getLogger(__name__)
+
 
 class TableCell(object):
 
@@ -58,7 +60,13 @@ def get_top_header_options(data,
                 width = width + widths[index]
                 index = index + 1
 
-            number_of_lines = len(simpleSplit(val, font_name, font_size, width))
+            try:
+                number_of_lines = len(simpleSplit(val, font_name, font_size, width))
+            except KeyError:
+                # These should be registered below
+                logger.warn("Invalid pdfmetrics state (%s)", pdfmetrics._fonts)
+                register_fonts()
+                number_of_lines = len(simpleSplit(val, font_name, font_size, width))
             if _max < number_of_lines:
                 _max = number_of_lines
 
