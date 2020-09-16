@@ -104,8 +104,11 @@ class UserInfo(object):
     @Lazy
     def sorting_key(self):
         if self.last_name and self.first_name:
-            return self.last_name + ', ' + self.first_name
-        return self.last_name or self.username
+            real_name = self.last_name + ', ' + self.first_name
+        else:
+            real_name = self.last_name or self.username
+        # Consistent ordering in case real_names match.
+        return (real_name, self.username)
 
     @Lazy
     def email(self):
