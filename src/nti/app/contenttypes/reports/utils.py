@@ -99,7 +99,7 @@ class UserInfo(object):
         self.perc = perc
 
     def __lt__(self, other):
-        return self.sorting_key.lower() < other.sorting_key.lower()
+        return self.sorting_key < other.sorting_key
 
     @Lazy
     def sorting_key(self):
@@ -108,7 +108,7 @@ class UserInfo(object):
         else:
             real_name = self.last_name or self.username
         # Consistent ordering in case real_names match.
-        return (real_name, self.username)
+        return (real_name.lower(), self.username.lower())
 
     @Lazy
     def email(self):
