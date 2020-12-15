@@ -24,6 +24,7 @@ from nti.contenttypes.reports.reports import evaluate_permission
 from nti.contenttypes.reports.reports import evaluate_predicate
 
 from nti.coremetadata.interfaces import IUser
+from nti.coremetadata.interfaces import IDeactivatedUser
 
 from nti.dataserver.users.interfaces import IFriendlyNamed
 
@@ -114,3 +115,7 @@ class UserInfo(object):
     def email(self):
         email_addressable = IEmailAddressable(self._user, None)
         return email_addressable.email if email_addressable else None
+
+    @Lazy
+    def deactivated(self):
+        return u'Yes' if IDeactivatedUser.providedBy(self._user) else u'No'
