@@ -118,4 +118,4 @@ class UserInfo(object):
 
     @Lazy
     def deactivated(self):
-        return u'Yes' if IDeactivatedUser.providedBy(self._user) else u'No'
+        return u'Yes' if IDeactivatedUser.providedBy(self._user) else u''
