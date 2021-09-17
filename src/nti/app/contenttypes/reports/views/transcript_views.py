@@ -148,7 +148,7 @@ class AbstractUserTranscriptView(AbstractReportView,
         for awarded_credit in self.sorted_credits:
             credit_def = awarded_credit.credit_definition
             current_amount = credit_amount_map.get(credit_def) or 0
-            credit_amount_map[credit_def] = current_amount +  float(('%.*f' % (awarded_credit.credit_definition.credit_precision, awarded_credit.amount)))
+            credit_amount_map[credit_def] = current_amount +  round(awarded_credit.amount, awarded_credit.credit_definition.credit_precision)
         result = [(credit_def, amount) for credit_def, amount in credit_amount_map.items()]
         result = sorted(result, key=lambda x: x[1], reverse=True)
         result = [AggregateCredit(x[0].credit_type, '%.*f %s' % (x[0].credit_precision, x[1], x[0].credit_units))
