@@ -33,7 +33,11 @@
     <!-- I18N -->
     <i18n:registerTranslations directory="locales" />
 
-	<!-- Decorators -->
+    <!-- Decorators -->
+    <adapter factory="nti.app.contenttypes.reports.reports.DefaultReportLinkProvider"
+	     provides="nti.app.contenttypes.reports.interfaces.IReportLinkProvider"
+	     for="nti.contenttypes.reports.interfaces.IReport" />
+	
     <subscriber factory=".decorators._ReportContextDecorator"
                 for="nti.contenttypes.reports.interfaces.IReportContext
                 	 pyramid.interfaces.IRequest"
