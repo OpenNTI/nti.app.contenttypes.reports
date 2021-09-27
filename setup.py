@@ -50,6 +50,7 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'nti.app.contenttypes.credit',
         'nti.contenttypes.reports',
         'nti.externalization',
         'nti.links',
