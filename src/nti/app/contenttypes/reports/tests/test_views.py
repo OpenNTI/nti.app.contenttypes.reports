@@ -18,6 +18,8 @@ from hamcrest import assert_that
 from hamcrest import has_entries
 from hamcrest import has_properties
 
+import simplejson as json
+
 from nti.app.contenttypes.credit import USER_TRANSCRIPT_VIEW_NAME
 from nti.app.contenttypes.credit import CREDIT_DEFINITIONS_VIEW_NAME
 
@@ -36,8 +38,6 @@ from nti.contenttypes.credit.credit import CreditDefinition
 from nti.dataserver.tests import mock_dataserver
 
 from nti.dataserver.users import User
-
-import simplejson as json
 
 from nti.app.contenttypes.reports.tests import ReportsLayerTest
 
@@ -66,6 +66,7 @@ class TestReportViews(ReportsLayerTest):
 
 
 class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
+    
     def _create_credit_def(self, precision=None, credit_type=None, credit_units=None):
         service_url = '/dataserver2/service/'
 
@@ -110,7 +111,8 @@ class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_aggregate_credit(self):
         """
-        Test aggregating credit in a transcript report with and without reduced credit value precision
+        Test aggregating credit in a transcript report with and without reduced
+        credit value precision
         """
         self.install_credit_definition_container()
         try:
@@ -132,7 +134,7 @@ class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
                                                   'Items', has_length(0),
                                                   'ItemCount', is_(0)))
 
-            #Create the credits to award
+            # Create the credits to award
             credit_definition_default_precision = self._create_credit_def()
             title = u'awarded credit (default precision) title'
             desc = u'awarded (default precision) credit desc'
@@ -141,16 +143,18 @@ class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
                                                   'description': desc,
                                                   'credit_definition': credit_definition_default_precision['NTIID'],
                                                   'awarded_date': "2013-08-13T06:00:00+00:00",
-                                                  'amount': 1.442}
+                                                  'amount': 1.44}
             
             awarded_credit_default_precision_2 = {'MimeType': UserAwardedCredit.mime_type,
                                                   'title': title,
                                                   'description': desc,
                                                   'credit_definition': credit_definition_default_precision['NTIID'],
                                                   'awarded_date': "2013-08-13T06:00:00+00:00",
-                                                  'amount': 1.682}
+                                                  'amount': 1.82}
             
-            credit_definition_reduced_precision = self._create_credit_def(precision=1, credit_type='precision_type', credit_units='precision_units')
+            credit_definition_reduced_precision = self._create_credit_def(precision=1, 
+                                                                          credit_type='precision_type', 
+                                                                          credit_units='precision_units')
             title = u'awarded credit (reduced precision) title'
             desc = u'awarded credit (reduced precision) desc'
             awarded_credit_reduced_precision_1 = {'MimeType': UserAwardedCredit.mime_type,
@@ -158,25 +162,36 @@ class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
                                                   'description': desc,
                                                   'credit_definition': credit_definition_reduced_precision['NTIID'],
                                                   'awarded_date': "2013-08-13T06:00:00+00:00",
-                                                  'amount': 1.44}
+                                                  'amount': 1.4}
             
             awarded_credit_reduced_precision_2 = {'MimeType': UserAwardedCredit.mime_type,
                                                   'title': title,
                                                   'description': desc,
                                                   'credit_definition': credit_definition_reduced_precision['NTIID'],
                                                   'awarded_date': "2013-08-13T06:00:00+00:00",
-                                                  'amount': 1.24}
+                                                  'amount': 3.4}
 
             # Award credits to user
-            self.testapp.put_json(user_transcript_url, awarded_credit_default_precision_1)
-            self.testapp.put_json(user_transcript_url, awarded_credit_default_precision_2)
-            self.testapp.put_json(user_transcript_url, awarded_credit_reduced_precision_1)
-            self.testapp.put_json(user_transcript_url, awarded_credit_reduced_precision_2)
+            self.testapp.put_json(user_transcript_url, 
+                                  awarded_credit_default_precision_1)
+            self.testapp.put_json(user_transcript_url, 
+                                  awarded_credit_default_precision_2)
+            self.testapp.put_json(user_transcript_url, 
+                                  awarded_credit_reduced_precision_1)
+            self.testapp.put_json(user_transcript_url, 
+                                  awarded_credit_reduced_precision_2)
 
             user_credits = self.testapp.get(user_transcript_url).json_body
             assert_that(user_credits, has_entries('Total', is_(4),
                                                   'Items', has_length(4),
                                                   'ItemCount', is_(4)))
+            
+            # Now reduce precision
+            self.testapp.put_json(credit_definition_default_precision['href'], 
+                                  {'credit_precision': "1"})
+            
+            self.testapp.put_json(credit_definition_reduced_precision['href'], 
+                                  {'credit_precision': "0"})
             
             with mock_dataserver.mock_db_trans(self.ds):
                 context = User.get_user(non_admin_username)
@@ -186,12 +201,12 @@ class TestUserTranscriptReportViews(ReportsLayerTest, CreditLayerTest):
                     context, request)
                 options = user_transcript_report()
                 
-            assert_that(options, has_entry('awarded_credits', has_items(has_entry('amount', u'1.44 new_units'),
-                                                                        has_entry('amount', u'1.68 new_units'),
-                                                                        has_entry('amount', u'1.4 precision_units'),
-                                                                        has_entry('amount', u'1.2 precision_units'))))     
-            assert_that(options, has_entry('aggregate_credit', has_items(has_properties({'type': u'new_types', 'amount': u'3.12 new_units'}),
-                                                                         has_properties({'type': u'precision_type', 'amount': u'2.6 precision_units'}))))   
+            assert_that(options, has_entry('awarded_credits', has_items(has_entry('amount', u'1.4 new_units'),
+                                                                        has_entry('amount', u'1.8 new_units'),
+                                                                        has_entry('amount', u'1 precision_units'),
+                                                                        has_entry('amount', u'3 precision_units'))))     
+            assert_that(options, has_entry('aggregate_credit', has_items(has_properties({'type': u'new_types', 'amount': u'3.2 new_units'}),
+                                                                         has_properties({'type': u'precision_type', 'amount': u'4 precision_units'}))))   
                       
         finally:
             self.uninstall_credit_definition_container()
