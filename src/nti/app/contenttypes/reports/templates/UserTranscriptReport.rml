@@ -36,7 +36,7 @@
     </h2>
 
 	<blockTable style='default'
-				colWidths="20% 20% 20% 20% 20%"
+				colWidths="20% 28% 20% 12% 20%"
 				tal:condition="options/awarded_credits"
 				repeatRows="1">
 		<tr>
