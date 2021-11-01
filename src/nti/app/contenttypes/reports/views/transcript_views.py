@@ -134,7 +134,9 @@ class AbstractUserTranscriptView(AbstractReportView,
         for awarded_credit in self.sorted_credits:
             awarded_credit_record = {}
             awarded_credit_record['title'] = awarded_credit.title
-            awarded_credit_record['issuer'] = awarded_credit.issuer
+            # These now default to site name, which may be long text without
+            # any spaces.
+            awarded_credit_record['issuer'] = self.wrap_text(awarded_credit.issuer, 30)
             awarded_credit_record['type'] = awarded_credit.credit_definition.credit_type
             awarded_credit_record['amount'] = self._get_credit_amount(awarded_credit)
             awarded_date = self._adjust_date(awarded_credit.awarded_date)
